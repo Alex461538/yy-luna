@@ -1,0 +1,14 @@
+{
+    "name": "std",
+    "version": "1.0.0",
+    "description": "Standard library",
+    "keywords": [
+        ""
+    ],
+    "license": "unknown",
+    "author": "",
+    "main": "main.lyn",
+    "packages": [],
+    "dev_packages": [],
+    "build": {}
+}

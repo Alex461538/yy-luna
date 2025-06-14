@@ -1,2 +1,7 @@
 __pycache__
+node_modules
 samples
+dist
+build
+trash
+.vscode
