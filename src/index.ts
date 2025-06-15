@@ -9,7 +9,6 @@ import { hideBin } from 'yargs/helpers';
 
 const FILENAME = fileURLToPath(import.meta.url);
 const DIRNAME = path.dirname(FILENAME);
-const GLYN_HOME = process.env.GLYN_HOME;
 
 const args: any = yargs(hideBin(process.argv))
     .command("build", "Builds a given project to an intermediate form")

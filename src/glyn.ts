@@ -7,6 +7,5 @@ export function build(dir: string)
     let project = new Project();
     project.fromDirectory(dir);
 
-    console.log(project.main);
-    
+    console.log(project);
 }

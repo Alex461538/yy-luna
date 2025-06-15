@@ -1,4 +1,4 @@
-import { lexerError } from "./errors";
+import { syntaxError } from "./errors";
 import { LEGAL_EXTRA_CHARS, OPERATOR_MAP, TOKEN_MAP, Token, TokenName } from "./token";
 
 export function tokenize(code: string, sourceFile: string = "unknown"): Token[] {
@@ -52,7 +52,7 @@ export function tokenize(code: string, sourceFile: string = "unknown"): Token[] 
 
         if (!(currentChar < code.length - 1)) {
             // unclosed trash
-            lexerError(`Unclosed comment at end of source`, currentChar, currentLine, currentColumn, code ?? "", sourceFile);
+            syntaxError(`Unclosed comment at end of source`, currentChar, currentLine, currentColumn, code ?? "", sourceFile);
         }
 
         currentChar += 2
@@ -70,6 +70,7 @@ export function tokenize(code: string, sourceFile: string = "unknown"): Token[] 
                 munchedText += code[currentChar];
                 currentChar++;
                 counter++;
+                currentColumn++;
             }
             else {
                 break
@@ -103,7 +104,7 @@ export function tokenize(code: string, sourceFile: string = "unknown"): Token[] 
 
         if (!(currentChar < code.length)) {
             // unclosed trash
-            lexerError(`Unclosed string at end of source`, currentChar, currentLine, currentColumn, code ?? "", sourceFile);
+            syntaxError(`Unclosed string at end of source`, currentChar, currentLine, currentColumn, code ?? "", sourceFile);
         }
 
         currentChar++
@@ -121,6 +122,7 @@ export function tokenize(code: string, sourceFile: string = "unknown"): Token[] 
                 munchedText += code[currentChar];
                 currentChar++;
                 counter++;
+                currentColumn++;
             }
             else {
                 break
@@ -144,13 +146,19 @@ export function tokenize(code: string, sourceFile: string = "unknown"): Token[] 
         else if (text = munchNumber()) {
             tokens.push({
                 kind: 'number',
-                text: text + ""
+                text: text + "",
+                line: currentLine,
+                column: currentColumn,
+                index: currentChar
             })
         }
         else if (text = munchString()) {
             tokens.push({
                 kind: 'string',
-                text: text + ""
+                text: text + "",
+                line: currentLine,
+                column: currentColumn,
+                index: currentChar
             })
         }
         else if (text = munchWord()) {
@@ -159,7 +167,10 @@ export function tokenize(code: string, sourceFile: string = "unknown"): Token[] 
             tokens.push({
                 kind: info?.kind || 'identifier',
                 text: text + "",
-                code: info?.code ?? -1
+                code: info?.code ?? -1,
+                line: currentLine,
+                column: currentColumn,
+                index: currentChar
             })
         }
         else {
@@ -182,11 +193,12 @@ export function tokenize(code: string, sourceFile: string = "unknown"): Token[] 
                     break;
                 }
                 currentChar++;
+                currentColumn++;
             }
             
             if (text.length <= 0)
             {
-                lexerError(`Illegal character sequence`, currentChar, currentLine, currentColumn, code ?? "", sourceFile);
+                syntaxError(`Illegal character sequence`, currentChar, currentLine, currentColumn, code ?? "", sourceFile);
             }
 
             if (info.paren)
@@ -200,7 +212,7 @@ export function tokenize(code: string, sourceFile: string = "unknown"): Token[] 
                     let lastBracket = bracketStack[ bracketStack.length - 1 ];
                     if (info.alternate != lastBracket?.type)
                     {
-                        lexerError(`Bracket closing mismatch`, currentChar, currentLine, currentColumn, code ?? "", sourceFile);
+                        syntaxError(`Bracket closing mismatch`, currentChar, currentLine, currentColumn, code ?? "", sourceFile);
                     }
                     tokens[ lastBracket.index ].closingPair = tokens.length;
                     bracketStack.pop()
@@ -211,7 +223,10 @@ export function tokenize(code: string, sourceFile: string = "unknown"): Token[] 
                 kind: info.kind,
                 text: text + "",
                 code: info.code,
-                paren: !!info.paren
+                paren: !!info.paren,
+                line: currentLine,
+                column: currentColumn,
+                index: currentChar
             })
         }
     }

@@ -33,6 +33,8 @@ export default class ProjectConfig {
                 this.main = data.main;
                 this.packages = data.packages;
                 this.build = data.build ?? {};
+
+                this.main = path.join(dir, this.main); /* Resolve path for main */
             } catch (error) {
                 projectError(`Configuration files are corrupt: ${fullPath}`)
             }

@@ -12,9 +12,9 @@ export function projectError(message: string) {
     process.exit(1);
 }
 
-export function lexerError(message: string, currentChar: number, currentLine: number, currentColumn: number, code: string, sourceFile: string = "<unknown>") {
-    const WINDOW_SIZE = 20;
-    const text = code.substring(currentChar - WINDOW_SIZE, currentChar + WINDOW_SIZE / 2);
+export function syntaxError(message: string, currentChar: number, currentLine: number, currentColumn: number, code: string, sourceFile: string = "<unknown>") {
+    const WINDOW_SIZE = 30;
+    const text = code.substring(currentChar - WINDOW_SIZE, currentChar + WINDOW_SIZE / 4);
 
     console.error(styleText(['magenta', 'bold'], `Syntax error:  ${message}`));
 
@@ -22,6 +22,13 @@ export function lexerError(message: string, currentChar: number, currentLine: nu
     console.error(styleText(["yellow", "bold"], "^^^".padStart(currentColumn, " ")))
 
     console.error(styleText(['magenta', 'bold'], `At: ${sourceFile} -- line: ${currentLine+1} column: ${currentColumn+1}`));
+
+    process.exit(1);
+}
+
+export function resolverError(message: string, sourceFile: string = "<unknown>") {
+    console.error(styleText(['magenta', 'bold'], `Resolver error:  ${message}`));
+    console.error(styleText(['magenta', 'bold'], `From: ${sourceFile}`));
 
     process.exit(1);
 }

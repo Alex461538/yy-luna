@@ -13,6 +13,7 @@ export const TokenName = {
     kw_function: 30,
     kw_class: 40,
     kw_var: 50,
+    kw_as: 60,
 
     brace_open: 500,
     brace_close: 501,
@@ -34,6 +35,7 @@ export const TOKEN_MAP = {
     false: {code: TokenName.co_false, kind: 'boolean'},
     
     import: {code: TokenName.kw_import, kind: 'keyword'},
+    as: {code: TokenName.kw_as, kind: 'keyword'},
     namespace: {code: TokenName.kw_namespace, kind: 'keyword'},
     function: {code: TokenName.kw_function, kind: 'keyword'},
     class: {code: TokenName.kw_class, kind: 'keyword'},
@@ -69,4 +71,8 @@ export class Token
     paren?: boolean = false;
     closingPair?: number = 0;
     canHaveDocs?: boolean = false;
+
+    line?: number = 0;
+    column?: number = 0;
+    index?: number = 0;
 }
