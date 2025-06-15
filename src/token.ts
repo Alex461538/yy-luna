@@ -1,5 +1,7 @@
 export type TokenKind = 'none' | 'identifier' | 'keyword' | 'number' | 'string' | 'boolean' | 'operator' | 'other'
 
+export type TokenEntry = { [key: string]: {code?: number, kind?: TokenKind, explanable?: boolean, paren?: boolean, opening?: boolean, alternate?: number} };
+
 export const TokenName = {
     co_false: 0,
     co_true: 1,
@@ -30,19 +32,19 @@ export const TokenName = {
     op_lshiftEqual: 1012,
 }
 
-export const TOKEN_MAP = {
+export const TOKEN_MAP: TokenEntry = {
     true: {code: TokenName.co_true, kind: 'boolean'},
     false: {code: TokenName.co_false, kind: 'boolean'},
     
     import: {code: TokenName.kw_import, kind: 'keyword'},
     as: {code: TokenName.kw_as, kind: 'keyword'},
-    namespace: {code: TokenName.kw_namespace, kind: 'keyword'},
-    function: {code: TokenName.kw_function, kind: 'keyword'},
-    class: {code: TokenName.kw_class, kind: 'keyword'},
-    var: {code: TokenName.kw_var, kind: 'keyword'},
+    namespace: {code: TokenName.kw_namespace, kind: 'keyword', explanable: true},
+    function: {code: TokenName.kw_function, kind: 'keyword', explanable: true},
+    class: {code: TokenName.kw_class, kind: 'keyword', explanable: true},
+    var: {code: TokenName.kw_var, kind: 'keyword', explanable: true},
 }
 
-export const OPERATOR_MAP = {
+export const OPERATOR_MAP: TokenEntry = {
     "{": {code: TokenName.brace_open, kind: 'other', paren: true, opening: true},
     "}": {code: TokenName.brace_close, kind: 'other', paren: true, opening: false, alternate: TokenName.brace_open},
     "(": {code: TokenName.paren_open, kind: 'other', paren: true, opening: true},

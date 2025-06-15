@@ -38,3 +38,8 @@ if (args._.includes("build")) {
 
     glyn.build(TRUE_PROJECT_DIRECTORY);
 }
+else if (args._.includes("doc")) {
+    const TRUE_PROJECT_DIRECTORY = path.join(process.cwd(), args.dir);
+
+    glyn.generate_docs(TRUE_PROJECT_DIRECTORY);
+}

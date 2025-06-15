@@ -32,3 +32,17 @@ export function resolverError(message: string, sourceFile: string = "<unknown>")
 
     process.exit(1);
 }
+
+export function parserError(message: string, currentChar: number, currentLine: number, currentColumn: number, code: string, sourceFile: string = "<unknown>") {
+    const WINDOW_SIZE = 30;
+    const text = code.substring(currentChar - WINDOW_SIZE, currentChar + WINDOW_SIZE / 4);
+
+    console.error(styleText(['magenta', 'bold'], `Parser error:  ${message}`));
+
+    console.error(text)
+    console.error(styleText(["yellow", "bold"], "^^^".padStart(currentColumn, " ")))
+
+    console.error(styleText(['magenta', 'bold'], `At: ${sourceFile} -- line: ${currentLine+1} column: ${currentColumn+1}`));
+
+    process.exit(1);
+}

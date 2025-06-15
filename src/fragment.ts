@@ -8,6 +8,7 @@ import { resolverError, syntaxError } from './errors';
 
 import semver from 'semver';
 import { resolveGlobal } from './glyn-y';
+import { parse } from './parser';
 
 function isSubpath(childPath: string, parentPath: string): boolean {
     const resolvedChild = path.resolve(childPath);
@@ -91,6 +92,17 @@ export class Project extends Fragment {
         // console.log(".. project ..");
         this.main?.preprocess();
     }
+
+    parse(): void {
+        if (this.parsed)
+        {
+            return;
+        }
+
+        super.parse();
+
+        this.main?.parse();
+    }
 }
 
 export class Source extends Fragment {
@@ -103,7 +115,7 @@ export class Source extends Fragment {
 
     constructor() {
         super();
-        // this.type = "source";
+        this.type = "source";
     }
 
     fromFile(file: string) {
@@ -241,7 +253,7 @@ export class Source extends Fragment {
             currentToken = this.tokens[cursor];
             /* Recalculate closing pairs for the new array */
             if (currentToken.paren && currentToken.closingPair != undefined) {
-                currentToken.closingPair += newTokens.length - this.tokens.length;
+                currentToken.closingPair += newTokens.length - cursor;
             }
 
             switch (currentToken.code) {
@@ -270,5 +282,23 @@ export class Source extends Fragment {
         }
 
         this.tokens = newTokens;
+    }
+
+    parse(): void {
+        if (this.parsed)
+        {
+            return;
+        }
+
+        super.parse();
+
+        for (const dependency of this.deps)
+        {
+            dependency.parse();
+        }
+
+        console.log("parsing ", this.path, this.type);
+
+        parse(this)
     }
 }

@@ -162,7 +162,7 @@ export function tokenize(code: string, sourceFile: string = "unknown"): Token[] 
             })
         }
         else if (text = munchWord()) {
-            let info: any = (TOKEN_MAP as any)[text];
+            let info: any = TOKEN_MAP[text];
 
             tokens.push({
                 kind: info?.kind || 'identifier',
@@ -183,7 +183,7 @@ export function tokenize(code: string, sourceFile: string = "unknown"): Token[] 
              */
 
             while (currentChar < code.length && LEGAL_EXTRA_CHARS.has(code[currentChar])) {
-                if ( (tempinfo = (OPERATOR_MAP as any)[text + code[currentChar]]) )
+                if ( (tempinfo = OPERATOR_MAP[text + code[currentChar]]) )
                 {
                     info = tempinfo;
                     text += code[currentChar]
@@ -196,16 +196,17 @@ export function tokenize(code: string, sourceFile: string = "unknown"): Token[] 
                 currentColumn++;
             }
             
-            if (text.length <= 0)
+            if (text.length <= 0 || !info)
             {
                 syntaxError(`Illegal character sequence`, currentChar, currentLine, currentColumn, code ?? "", sourceFile);
+                return [];
             }
 
             if (info.paren)
             {
                 if (info.opening)
                 {
-                    bracketStack.push({ type: info.code, index: tokens.length })
+                    bracketStack.push({ type: info.code ?? -1, index: tokens.length })
                 }
                 else
                 {
@@ -220,7 +221,7 @@ export function tokenize(code: string, sourceFile: string = "unknown"): Token[] 
             }
 
             tokens.push({
-                kind: info.kind,
+                kind: info.kind ?? 'none',
                 text: text + "",
                 code: info.code,
                 paren: !!info.paren,
