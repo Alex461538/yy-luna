@@ -1,4 +1,4 @@
-import { AstNode, NodeType } from "./ast";
+import { Symbol, SymbolType } from "./symbol";
 import { parserError, syntaxError } from "./errors";
 import { Token, TokenKind, TokenName } from "./token";
 import * as util from 'util';
@@ -9,7 +9,7 @@ export function parse(source: any) {
     let currentToken: Token | undefined;
     let cursor = 0;
 
-    let scopeStack: (AstNode | any)[] = []
+    let scopeStack: (Symbol | any)[] = []
 
     let consume = (query: { kind?: TokenKind, code?: number }) => {
         let k = !!query.kind;
@@ -41,12 +41,12 @@ export function parse(source: any) {
         syntaxError("I am waiting for other thing to come here bruh", token.index ?? 0, token.line ?? 0, token.column ?? 0, source.text, source.path);
     }
 
-    let parseType = (leaf: AstNode) => {
+    let parseType = () => {
         return consume({ kind: 'identifier' })?.text ?? 'void';
     }
 
-    let parseFunction = (leaf: AstNode) => {
-        let functionNode = new AstNode();
+    let parseFunction = () => {
+        let current = new Symbol();
 
         expect({ code: TokenName.kw_function });
         /* Try to consume a name if it is not an anonymous function */
@@ -55,58 +55,62 @@ export function parse(source: any) {
         /* for now, don't parse args */
         expect({ code: TokenName.paren_close });
 
-        functionNode.type = NodeType.function;
-        functionNode.name = name?.text ?? UNNAMED_MEMBER_NAME;
+        current.type = SymbolType.function;
+        current.name = name?.text ?? UNNAMED_MEMBER_NAME;
 
         let colon = consume({ code: TokenName.colon });
         if (colon)
         {
-            functionNode.returnType = parseType(functionNode);
+            current.returnType = parseType();
         }
         else
         {
-            functionNode.returnType = 'void';
+            current.returnType = 'void';
         }
 
-        scopeStack.push(functionNode);
+        scopeStack.push(current);
 
         let beginning = consume({ code: TokenName.brace_open });
 
         if (beginning) {
-            functionNode.completeMember = true;
+            current.completeMember = true;
             cursor = (beginning?.closingPair ?? cursor) + 1;
         }
         else {
-            functionNode.completeMember = false;
+            current.completeMember = false;
             expect({ code: TokenName.eol });
         }
 
         scopeStack.pop()
 
-        return functionNode;
+        return current;
     }
 
-    let parseNamespace = (leaf: AstNode) => {
-        let namespaceNode = new AstNode();
+    let parseNamespace = (is_root: boolean = false) => {
+        let current = new Symbol();
 
         expect({ code: TokenName.kw_namespace });
         let name = expect({ kind: 'identifier' });
         let beginning = expect({ code: TokenName.brace_open });
 
-        namespaceNode.type = NodeType.namespace;
-        namespaceNode.name = name?.text;
+        current.type = SymbolType.namespace;
+        current.name = name?.text;
 
-        scopeStack.push(namespaceNode);
+        scopeStack.push(current);
 
         while (cursor < source.tokens.length && cursor < (beginning?.closingPair ?? 0)) {
             currentToken = source.tokens[cursor];
 
             switch (currentToken?.code) {
                 case TokenName.kw_namespace: {
-                    namespaceNode.addChild( parseNamespace(namespaceNode) );
+                    let newSymbol = parseNamespace();
+                    current.define( newSymbol.name!, newSymbol );
+                    newSymbol.parent = newSymbol;
                 } break;
                 case TokenName.kw_function: {
-                    namespaceNode.addChild( parseFunction(namespaceNode) );
+                    let newSymbol = parseFunction();
+                    current.define( newSymbol.name!, newSymbol );
+                    newSymbol.parent = newSymbol;
                 } break;
                 default:
                     parserError(`Only declarations are permitted inside a namespace, found "${currentToken?.text}"`, currentToken?.index ?? 0, currentToken?.line ?? 0, currentToken?.column ?? 0, source.text, source.path);
@@ -115,34 +119,27 @@ export function parse(source: any) {
         }
 
         cursor = (beginning?.closingPair ?? cursor) + 1;
+
         scopeStack.pop()
 
-        return namespaceNode;
+        return current;
     }
 
-    let parseTopLevel = (leaf?: AstNode) => {
-        let root = new AstNode();
-        root.type = NodeType.root;
-        root.name = '<root>'
-
+    let parseTopLevel = () => {
         while (cursor < source.tokens.length) {
             currentToken = source.tokens[cursor];
-
             switch (currentToken?.code) {
                 case TokenName.kw_namespace: {
-                    root.addChild( parseNamespace(root) );
+                    return parseNamespace(true)
                 } break;
                 default:
-                    console.log(currentToken);
-                    cursor++;
+                    parserError("Only a namespace should be present at the root", currentToken?.index!, currentToken?.line!, currentToken?.column!, source.text, source.path);
                     break;
             }
         }
-
-        return root;
     }
 
-    let topNode: AstNode = parseTopLevel();
+    let topNode: Symbol = parseTopLevel()!;
 
     console.log(
         util.inspect(topNode, { compact: false, colors: true, depth: 5, showHidden: false })
