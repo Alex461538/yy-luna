@@ -1,6 +1,7 @@
 export type TokenKind = 'none' | 'identifier' | 'keyword' | 'number' | 'string' | 'boolean' | 'operator' | 'other'
-
 export type TokenEntry = { [key: string]: {code?: number, kind?: TokenKind, explanable?: boolean, paren?: boolean, opening?: boolean, alternate?: number} };
+
+export const CONFIG_NAME = "config.json";
 
 export const TokenName = {
     co_false: 0,
@@ -16,6 +17,7 @@ export const TokenName = {
     kw_class: 40,
     kw_var: 50,
     kw_as: 60,
+    kw_return: 60,
 
     brace_open: 500,
     brace_close: 501,
@@ -42,6 +44,7 @@ export const TOKEN_MAP: TokenEntry = {
     function: {code: TokenName.kw_function, kind: 'keyword', explanable: true},
     class: {code: TokenName.kw_class, kind: 'keyword', explanable: true},
     var: {code: TokenName.kw_var, kind: 'keyword', explanable: true},
+    return: {code: TokenName.kw_return, kind: 'keyword', explanable: true},
 }
 
 export const OPERATOR_MAP: TokenEntry = {
@@ -65,16 +68,70 @@ export const OPERATOR_MAP: TokenEntry = {
 
 export const LEGAL_EXTRA_CHARS = new Set([ '+', '<', '=', ';', ':', '[', ']', '{', '}', '(', ')' ])
 
-export class Token
+export declare class Token
 {
-    kind: TokenKind = 'none';
-    code?: number = TokenName.kw_namespace;
-    text: string = "";
-    paren?: boolean = false;
-    closingPair?: number = 0;
-    canHaveDocs?: boolean = false;
+    kind: TokenKind;
+    code?: number;
+    text: string;
+    paren?: boolean;
+    closingPair?: number;
+    canHaveDocs?: boolean;
 
-    line?: number = 0;
-    column?: number = 0;
-    index?: number = 0;
+    line?: number;
+    column?: number;
+    index?: number;
+}
+
+export declare class ProjectConfig {
+    name: string;
+    version: string;
+    description: string;
+    keywords: string[];
+    license: string;
+    author: string;
+    main: string;
+    packages: { name: string, version: string }[];
+    build: any;
+
+    fromDirectory(dir: string): void;
+}
+
+export type FragmentType = "none" | "project" | "source"
+
+export interface Fragment {
+    type: FragmentType;
+    path: string;
+    preprocessed: boolean;
+    parsed: boolean;
+    root: Fragment | undefined;
+
+    preprocess(): void;
+    parse(): void;
+}
+
+export interface Project extends Fragment {
+    config: ProjectConfig;
+    main: Source | undefined;
+    sources: { [key: string]: any };
+
+    fromDirectory(dir: string): void;
+    addFile(file: string): Source;
+    addProject(dir: string): Project;
+    preprocess(): void;
+    parse(): void;
+}
+
+export declare interface Source extends Fragment {
+    project: Project | undefined;
+    name: string;
+    text: string;
+    deps: Fragment[];
+    tokens: Token[];
+    depAliases: { [key: string]: Fragment };
+
+    fromFile(file: string): void;
+    resolve(query: string): Fragment;
+
+    preprocess(): void;
+    parse(): void;
 }

@@ -9,7 +9,7 @@ export function projectError(message: string) {
         { stream: stderr },
     );
     console.error(errorMessage);
-    process.exit(1);
+    throw "exit";
 }
 
 export function syntaxError(message: string, currentChar: number, currentLine: number, currentColumn: number, code: string, sourceFile: string = "<unknown>") {
@@ -23,14 +23,14 @@ export function syntaxError(message: string, currentChar: number, currentLine: n
 
     console.error(styleText(['magenta', 'bold'], `At: ${sourceFile} -- line: ${currentLine+1} column: ${currentColumn+1}`));
 
-    process.exit(1);
+    throw "exit";
 }
 
 export function resolverError(message: string, sourceFile: string = "<unknown>") {
     console.error(styleText(['magenta', 'bold'], `Resolver error:  ${message}`));
     console.error(styleText(['magenta', 'bold'], `From: ${sourceFile}`));
 
-    process.exit(1);
+    throw "exit";
 }
 
 export function parserError(message: string, currentChar: number, currentLine: number, currentColumn: number, code: string, sourceFile: string = "<unknown>") {
@@ -44,5 +44,5 @@ export function parserError(message: string, currentChar: number, currentLine: n
 
     console.error(styleText(['magenta', 'bold'], `At: ${sourceFile} -- line: ${currentLine+1} column: ${currentColumn+1}`));
 
-    process.exit(1);
+    throw "exit";
 }
