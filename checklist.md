@@ -4,10 +4,10 @@
 - [x] Kword import <x>
 - [x] Import desde path relativo
 - [x] Import desde search directories (packages)
-- [ ] Kword import <x> as <y>
+- [x] Kword import <x> as <y>
 - [x] Reciclaje
 - [ ] Aliasing parcial
-- [ ] Versionado de imports
+- [x] Versionado de imports
 
 ## Parser
 

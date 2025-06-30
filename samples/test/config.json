@@ -1,0 +1,31 @@
+{
+    "name": "test",
+    "version": "1.0.0",
+    "description": "Una cosita bella",
+    "keywords": [
+        "Testeo",
+        "examen",
+        "reucolsan"
+    ],
+    "license": "UNLICENSED",
+    "author": "Yo",
+    "main": "main.lyn",
+    "packages": [
+        {
+            "name": "truetype",
+            "version": "1.0.0"
+        },
+        {
+            "name": "truetype",
+            "version": "0.1.0"
+        },
+        {
+            "name": "std",
+            "version": "1.0.0"
+        }
+    ],
+    "dev_packages": [],
+    "build": {
+        "backend": "llvm"
+    }
+}

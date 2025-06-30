@@ -1,0 +1,14 @@
+{
+    "version": 8,
+    "configurePresets": [
+        {
+            "name": "vcpkg",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": {
+                   "value": "C:/Users/alexg/AppData/Local/vcpkg/scripts/buildsystems/vcpkg.cmake",
+                    "type": "FILEPATH"
+                }
+            }
+        }
+    ]
+}
