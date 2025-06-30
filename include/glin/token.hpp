@@ -9,12 +9,12 @@ namespace Token
 {
     enum class Kind : uint16_t
     {
+        T_IS_OPERATOR = 0x80'00,
+        T_IS_CONSTANT = 0x40'00,
         T_EOF = 0,
+
         T_SEMICOLON,
         T_INVALID,
-        T_CONSTANT,
-        T_STRING,
-        T_KEYWORD,
         T_IDENTIFIER,
         T_PUNCTUATOR,
 
@@ -25,17 +25,29 @@ namespace Token
         T_OPEN_SQUARE,
         T_CLOSE_SQUARE,
 
-        T_IMPORT,
-        T_AS,
-        T_NAMESPACE,
-        T_VAR,
-        T_CLASS,
-        T_FUNCTION,
-        T_RETURN
+        K_IMPORT,
+        K_AS,
+        K_NAMESPACE,
+        K_VAR,
+        K_CLASS,
+        K_FUNCTION,
+        K_RETURN,
+
+        C_NUMBER = T_IS_CONSTANT,
+        C_TRUE,
+        C_FALSE,
+        C_INFINITY,
+        C_STRING,
+        C_COMMENT,
+
+        O_ASSIGN = T_IS_OPERATOR,
+        O_PLUS,
+        O_PLUS_EQ
     };
 
     extern const std::map<char, Kind> literalTokens;
     extern const std::map<std::string, Kind> keywordTokens;
+    extern const std::map<std::string, Kind> specialTokens;
 
     std::string kindName(Kind kind);
 

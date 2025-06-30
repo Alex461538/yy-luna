@@ -71,11 +71,10 @@ namespace CLI
                 Lexer::Lexer lexer = Lexer::Lexer();
                 lexer.content = content.data();
                 lexer.length = content.size();
+                Token::Token token = lexer.next();
 
                 std::cout << content;
                 
-                Token::Token token = lexer.next();
-                std::cout << "Token pre: " << (std::string)token << std::endl;
                 while (token.kind != Token::Kind::T_EOF)
                 {
                     std::cout << "Token: " << (std::string)token << std::endl;
