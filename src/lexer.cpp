@@ -63,6 +63,8 @@ namespace Lexer
     {
         Token::Token token = Token::Token();
 
+        trim();
+
         token.text = &content[length - 1];
 
         if (cursor >= length)
@@ -79,6 +81,18 @@ namespace Lexer
                 cursor++;
                 token.length++;
             }
+            if (auto keywordToken = Token::keywordTokens.find(std::string(token.text, token.length)); keywordToken != Token::keywordTokens.end())
+            {
+                token.kind = keywordToken->second;
+            }
+            return token;
+        }
+
+        if (auto literalToken = Token::literalTokens.find(content[cursor]); literalToken != Token::literalTokens.end())
+        {
+            token.kind = literalToken->second;
+            token.text = &content[cursor++];
+            token.length = 1;
             return token;
         }
 

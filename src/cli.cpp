@@ -13,22 +13,17 @@ namespace CLI
 {
     void printBanner()
     {
-        std::cout <<"                     ++         \n" \
-                    "                     =%%=       \n" \
-                    "                     .%#%*      \n" \
-                    "                     .%##%=     \n" \
-                    "                     =%##%%     \n" \
-                    "                    .%%###%:    \n" \
-                    "                   .%%%%%%%:    \n" \
-                    "                  *%%%%%%%#     \n" \
-                    "              .-*%%%%%%%%%:     \n" \
-                    "     -%#*++*#%%%%%%%%%%%%-      \n" \
-                    "      .*%%%%%#%%%%%%###*        \n" \
-                    "         =%%%%%%%%%##-          \n" \
-                    "              .:.               \n\n";
+        std::cout <<"     ..  ##     \n" \
+                    "  ...      ###  \n" \
+                    " ...        ### \n" \
+                    "...          ###\n" \
+                    ":::          +++\n" \
+                    " ::-        -++ \n" \
+                    "  ---      ---  \n" \
+                    "     --  --     \n";
         std::cout << "Thanks for using the luna compiler - Your most adrade resource for making simple things." << std::endl;
         std::cout << "v0.0: If you have an interesting idea for improving this, or want to see other projects check out these links!" << std::endl;
-        std::cout << " - GitHub: https://github.com/Alex461538/glyn" << std::endl;
+        std::cout << " - GitHub: https://github.com/Alex461538/glin" << std::endl;
         std::cout << " - Yt: https://youtube.com/@pianitas38 " << std::endl;
     }
 
