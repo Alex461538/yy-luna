@@ -1,6 +1,7 @@
 #ifndef _GLIN_LEXER_HPP_
 #define _GLIN_LEXER_HPP_
 
+#include <iostream>
 #include "glin/token.hpp"
 
 namespace Lexer
@@ -19,7 +20,15 @@ namespace Lexer
         size_t line;
         size_t bol;
 
-        void Lever();
+        Lexer()
+        {
+            std::cout << "Constructed lexer";
+            content = nullptr;
+            cursor = 0;
+            line = 0;
+            bol = 0;
+        }
+
         void trim();
 
         Token::Token next();

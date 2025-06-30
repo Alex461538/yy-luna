@@ -59,16 +59,17 @@ namespace CLI
                 return 1;
             }
 
-            std::stringstream buffer;
+            std::stringstream buffer = std::stringstream();
             std::ifstream file(Paths::getTrueCallerPath(path), std::ios::binary);
-            if (!file.fail())
+
+            if (!file.fail() && !file.bad())
             {
                 buffer << file.rdbuf();
-                file.close();
 
                 std::string content = buffer.str();
 
                 Lexer::Lexer lexer = Lexer::Lexer();
+                
                 lexer.content = content.data();
                 lexer.length = content.size();
                 Token::Token token = lexer.next();
@@ -80,6 +81,8 @@ namespace CLI
                     std::cout << "Token: " << (std::string)token << std::endl;
                     token = lexer.next();
                 }
+
+                file.close();
             }
         }
         else if (action == "doc")

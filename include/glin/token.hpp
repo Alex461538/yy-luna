@@ -54,17 +54,22 @@ namespace Token
     struct Location
     {
         const char *source;
-        long line;
-        long column;
+        size_t line;
+        size_t column;
+
+        Location();
     };
 
     struct Token
     {
+        Location location;
         const char *text;
         const char *docs;
         size_t length;
         size_t docs_length;
-        Kind kind = Kind::T_EOF;
+        Kind kind;
+
+        Token();
 
         operator std::string() const;
     };

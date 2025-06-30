@@ -30,14 +30,6 @@ namespace Lexer
         return isAlpha(code) || code == '_';
     }
 
-    void Lexer::Lever()
-    {
-        content = nullptr;
-        cursor = 0;
-        line = 0;
-        bol = 0;
-    }
-
     void Lexer::trim()
     {
         if (!content)
