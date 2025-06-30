@@ -1,5 +1,6 @@
 #include "glin/token.hpp"
 
+#include <iostream>
 #include <string>
 
 namespace Token {
@@ -21,6 +22,6 @@ namespace Token {
     }
 
     Token::operator std::string() const {
-        return (text ? "rrr" : "") + kindName(kind);
+        return (text ? std::string(text, length) : "") + " <" + kindName(kind) + ">";
     }
 }

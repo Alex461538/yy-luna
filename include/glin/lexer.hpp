@@ -9,6 +9,7 @@ namespace Lexer
     inline bool isDigit(char code);
     inline bool isAlpha(char code);
     inline bool isWord(char code);
+    inline bool isWordStart(char code);
 
     struct Lexer
     {

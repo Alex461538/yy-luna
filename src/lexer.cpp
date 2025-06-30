@@ -1,5 +1,6 @@
 #include "glin/lexer.hpp"
 
+#include <iostream>
 #include "glin/token.hpp"
 
 namespace Lexer
@@ -21,7 +22,12 @@ namespace Lexer
 
     inline bool isWord(char code)
     {
-        return isAlpha(code) || isDigit(code);
+        return isAlpha(code) || isDigit(code) || code == '_';
+    }
+
+    inline bool isWordStart(char code)
+    {
+        return isAlpha(code) || code == '_';
     }
 
     void Lexer::Lever()
@@ -55,7 +61,7 @@ namespace Lexer
 
     Token::Token Lexer::next()
     {
-        Token::Token token;
+        Token::Token token = Token::Token();
 
         token.text = &content[length - 1];
 
@@ -63,6 +69,24 @@ namespace Lexer
         {
             return token;
         }
+
+        if (isWordStart(content[cursor]))
+        {
+            token.text = &content[cursor];
+            token.kind = Token::Kind::T_IDENTIFIER;
+            while (cursor < length && isWord(content[cursor]))
+            {
+                cursor++;
+                token.length++;
+            }
+            return token;
+        }
+
+        token.kind = Token::Kind::T_INVALID;
+        token.text = &content[cursor];
+        token.length = 1;
+
+        cursor++;
 
         return token;
     }

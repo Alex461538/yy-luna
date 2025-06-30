@@ -28,13 +28,13 @@ namespace CLI
                     "              .:.               \n\n";
         std::cout << "Thanks for using the luna compiler - Your most adrade resource for making simple things." << std::endl;
         std::cout << "v0.0: If you have an interesting idea for improving this, or want to see other projects check out these links!" << std::endl;
-        std::cout << " - GitHub: https://github.com/Alex461538/glyn-python " << std::endl;
+        std::cout << " - GitHub: https://github.com/Alex461538/glyn" << std::endl;
         std::cout << " - Yt: https://youtube.com/@pianitas38 " << std::endl;
     }
 
     void printSyntaxError(std::string message)
     {
-        std::cout << message + "\nTry glyn help for more details.";
+        std::cout << message + "\nTry glin help for more details.";
     }
 
     int exec(int argc, char** argv) {
@@ -73,14 +73,18 @@ namespace CLI
 
                 std::string content = buffer.str();
 
-                Lexer::Lexer lexer;
+                Lexer::Lexer lexer = Lexer::Lexer();
                 lexer.content = content.data();
                 lexer.length = content.size();
+
+                std::cout << content;
                 
                 Token::Token token = lexer.next();
+                std::cout << "Token pre: " << (std::string)token << std::endl;
                 while (token.kind != Token::Kind::T_EOF)
                 {
-                    std::cout << (std::string)token << std::endl;
+                    std::cout << "Token: " << (std::string)token << std::endl;
+                    token = lexer.next();
                 }
             }
         }
