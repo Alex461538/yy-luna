@@ -1,8 +1,8 @@
 # ✨ yy (luna) compiler
 
-<img src="yy.png" alt="drawing" width="200" />
+<img src="banner.png" alt="drawing" width="100%" />
 
-Named in part as a reference to yy-chr, YY (luna) is an experimental compiler project, made just for fun, but for general purposes too. In fact I want for this language to be embeddable into anything.
+Named in part as a reference to yy-chr, YY (luna) is an experimental compiler project, made just for fun, but also to be embeddable into anything.
 
 ### I will like to compile someday this for a NES straight:
 
@@ -66,7 +66,7 @@ With your specific environment or toolchain, you should grab the required librar
 ## Check out this 🔥
 
 <div>
-    <span style="font-weight: bold; font-size: 16px; display:flex; align-items: center; gap: 5px;" ><img src="pet.png" alt="drawing" width="32" />Check out the channel, and eat some cake: <a href="https://youtube.com/@pianitas38" >Tesorito 🌙</a> </span>
+    <strong style="font-size: 16px; display:flex; align-items: center; gap: 5px;" ><img src="pet.png" alt="drawing" width="32" />Check out the channel, and eat some cake: <a href="https://youtube.com/@pianitas38" >Tesorito 🌙</a> </strong>
 </div>
 
 ## License
