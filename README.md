@@ -1,8 +1,8 @@
 # ✨ yy (luna) compiler
 
-<img src="banner.png" alt="drawing" width="100%" />
+<img src="images/banner.png" alt="drawing" width="100%" />
 
-Named in part as a reference to yy-chr, YY (luna) is an experimental compiler project, made just for fun, but also to be embeddable into anything.
+Named in part as a reference to yy-chr, yy-luna is an experimental compiler project, made just for fun, but also to be embeddable into anything.
 
 ### I will like to compile someday this for a NES straight:
 
@@ -58,20 +58,21 @@ Portable binaries will be available under the releases section.
 ```bash
 git clone https://github.com/Alex461538/yy-luna
 cd yy-luna
-make
+cmake -S . -B build
+cmake --build build
 ```
 
-With your specific environment or toolchain, you should grab the required libraries easily for linking, for windows I like vcpkg, and for linux I really like  raw apt, it works somehow.
+With your specific environment or toolchain, you should grab the required libraries easily for linking. For windows I like vcpkg, and for linux I really like  raw apt, it works somehow.
 
 ## Check out this 🔥
 
 <div>
-    <strong style="font-size: 16px; display:flex; align-items: center; gap: 5px;" ><img src="pet.png" alt="drawing" width="32" />Check out the channel, and eat some cake: <a href="https://youtube.com/@pianitas38" >Tesorito 🌙</a> </strong>
+    <strong style="font-size: 16px; display:flex; align-items: center; gap: 5px;" ><img src="images/pet.png" alt="drawing" width="32" />Check out the channel, and eat some cake: <a href="https://youtube.com/@pianitas38" >Tesorito 🌙</a> </strong>
 </div>
 
 ## License
 
-This project has the [Artistic License 2.0](https://opensource.org/license/artistic-2-0). I want to be flexible but this work has some value for me, in short words this license states:
+This project is under the [Artistic License 2.0](https://opensource.org/license/artistic-2-0). I want to be flexible and also this machine has some value for me, in short words this license states:
 
 - Free modification and redistribution provided that:
 - Any modification is explicitly marked as such.
