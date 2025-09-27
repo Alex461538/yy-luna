@@ -9,6 +9,8 @@ find_package(OpenGL REQUIRED)
 
 add_executable(yy-luna 
     src/main.cpp
+    src/workspace.hpp
+    src/problem.hpp
 )
 
 target_include_directories(yy-luna 
