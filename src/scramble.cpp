@@ -1,34 +1,15 @@
-#include <fstream>
-#include <filesystem>
-#include <string>
-#include <vector>
+#include "scramble.hpp"
 
-#include "problem.hpp"
-
-#include <json.hpp>
-
-using json = nlohmann::json;
-
-namespace Workspace
+namespace YY
 {
-    struct Project
+    namespace Scramble
     {
-        std::filesystem::path path;
-        std::string name;
-        std::string main_file;
-        std::string author;
-        std::string description;
-        std::string version;
-        std::vector<std::string> keywords;
-
-        std::vector<Problem::Problem> problems;
-
-        void panic(Problem::Problem problem)
+        void Project::panic(Problem::Problem problem)
         {
             problems.push_back(problem);
         }
 
-        static Project fromPath(const std::filesystem::path& path)
+        Project Project::fromPath(const std::filesystem::path &path)
         {
             Project project;
             project.path = path;
@@ -36,7 +17,7 @@ namespace Workspace
             std::printf("Loading workspace from path: %s\n", path.c_str());
 
             json yyconf = {};
-            std::ifstream file( (std::filesystem::path(path) / "yyconf.json").c_str() );
+            std::ifstream file((std::filesystem::path(path) / "yyconf.json").c_str());
 
             if (file.fail())
             {
@@ -48,12 +29,12 @@ namespace Workspace
                 {
                     yyconf = json::parse(file);
                 }
-                catch(const std::exception& e)
+                catch (const std::exception &e)
                 {
                     project.panic(Problem::problemOf<Problem::Type::ERR_PROJECT_INVALID_CONFIG>(path.c_str(), e.what()));
                 }
             }
-            
+
             file.close();
 
             if (!yyconf.is_null())
@@ -106,7 +87,7 @@ namespace Workspace
 
                 if (yyconf.contains("keywords") && yyconf["keywords"].is_array())
                 {
-                    for (const auto& keyword : yyconf["keywords"])
+                    for (const auto &keyword : yyconf["keywords"])
                     {
                         if (keyword.is_string())
                         {
@@ -122,31 +103,13 @@ namespace Workspace
 
             return project;
         }
-    };
 
-    struct File
-    {
-        std::filesystem::path path;
-        std::filesystem::path relative_to_project_path;
-
-        std::string content;
-    };
-
-    struct Workspace
-    {
-        std::filesystem::path root_path;
-
-        std::vector<Project> projects;
-        std::vector<File> files;
-
-        std::vector<Problem::Problem> problems;
-
-        void panic(Problem::Problem problem)
+        void Workspace::panic(Problem::Problem problem)
         {
             problems.push_back(problem);
         }
 
-        static Workspace fromPath(const std::filesystem::path& path)
+        Workspace Workspace::fromPath(const std::filesystem::path &path)
         {
             Workspace workspace;
             workspace.root_path = path;
@@ -155,5 +118,5 @@ namespace Workspace
 
             return workspace;
         }
-    };
+    }
 }

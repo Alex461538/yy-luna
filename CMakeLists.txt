@@ -9,13 +9,16 @@ find_package(OpenGL REQUIRED)
 
 add_executable(yy-luna 
     src/main.cpp
-    src/workspace.hpp
-    src/problem.hpp
+
+    src/scramble.cpp
+    src/problem.cpp
+    src/utils.cpp
 )
 
 target_include_directories(yy-luna 
     PRIVATE
         ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/src
 )
 
 # Linking examples, you could make bindings for SDL

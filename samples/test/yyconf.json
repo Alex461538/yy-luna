@@ -8,7 +8,7 @@
         "reucolsan"
     ],
     "author": "Yo",
-    "main": "main.lyn",
+    "main": "main.yy",
     "packages": [
         {
             "name": "truetype",
