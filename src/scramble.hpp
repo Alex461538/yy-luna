@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 
+#include "lexer.hpp"
 #include "problem.hpp"
 
 #include <json.hpp>
@@ -71,6 +72,8 @@ namespace YY
 
             std::vector<Problem::Problem> problems;
             std::vector<std::shared_ptr<File>> imports;
+
+            std::vector<Token::Token> tokens; 
 
             void panic(Problem::Problem problem);
             void loadFromPath(const std::filesystem::path &path);

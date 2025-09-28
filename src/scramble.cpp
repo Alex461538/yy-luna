@@ -162,6 +162,34 @@ namespace YY
         {
             this->path = path;
             relative_path = std::filesystem::relative(path, owner_project->root_path);
+
+            std::stringstream buffer = std::stringstream();
+            std::ifstream file( path, std::ios::binary);
+
+            if (!file.fail() && !file.bad())
+            {
+                buffer << file.rdbuf();
+                content = buffer.str();
+            }
+            else
+            {
+                panic(Problem::problemOf<Problem::Type::ERR_FILE_NOT_FOUND>(path.c_str(), "This file does not exist or is not readable."));
+            }
+
+            Lexer::Lexer lexer = Lexer::Lexer();
+            
+            lexer.content = content.data();
+            lexer.length = content.size();
+
+            Token::Token token = lexer.next();
+                
+            while (token.kind != Token::Kind::T_EOF)
+            {
+                tokens.push_back(token);
+                token = lexer.next();
+            }
+
+            tokens.push_back(token);
         }
 
         Project::operator json() const
@@ -193,9 +221,9 @@ namespace YY
                 aprobs.push_back(std::string(p));
             }
 
-            for (auto &p : files)
+            for (auto &f : files)
             {
-                afiles.push_back( json(*p.get()) );
+                afiles.push_back( json(*f.get()) );
             }
 
             return data;
@@ -233,11 +261,19 @@ namespace YY
             data["relative_path"] = relative_path.c_str();
 
             data["problems"] = json::array();
+            data["tokens"] = json::array();
+
             auto &aprobs = data.at("problems");
+            auto &atoks = data.at("tokens");
 
             for (auto &p : problems)
             {
                 aprobs.push_back(std::string(p));
+            }
+
+            for (auto &t : tokens)
+            {
+                atoks.push_back(std::string(t));
             }
 
             return data;

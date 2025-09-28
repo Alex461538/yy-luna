@@ -13,8 +13,9 @@ add_executable(yy-luna
     src/scramble.cpp
     src/problem.cpp
     src/info.cpp
-
     src/cli.cpp
+    src/token.cpp
+    src/lexer.cpp
 )
 
 target_include_directories(yy-luna 
