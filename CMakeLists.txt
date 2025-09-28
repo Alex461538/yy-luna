@@ -12,7 +12,9 @@ add_executable(yy-luna
 
     src/scramble.cpp
     src/problem.cpp
-    src/utils.cpp
+    src/info.cpp
+
+    src/cli.cpp
 )
 
 target_include_directories(yy-luna 

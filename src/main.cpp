@@ -39,18 +39,18 @@ int main( int argc, const char **argv )
 {
     YY::init();
 
-    YY::Scramble::Workspace workspace = YY::Scramble::Workspace::fromPath("./samples/test");
+    json payload = YY::CLI::parseArgs(argc, argv);
 
-    for (const auto& problem : workspace.problems)
+    std::filesystem::path source = payload["source"];
+
+    if (source.empty() || !source.is_absolute())
     {
-        std::cout << std::string(problem) << std::endl;
+        return 1;
     }
 
-    std::cout << workspace.problems.size();
-    for (const auto& project_problem : workspace.projects[0].problems)
-    {
-        std::cout << std::string(project_problem) << std::endl;
-    }
+    YY::Scramble::Workspace workspace = YY::Scramble::pathToWorkspace(source);
+
+    std::cout << ((json)workspace).dump(4) << std::endl;
 
     return 0;
 }

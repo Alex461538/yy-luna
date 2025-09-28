@@ -1,8 +1,6 @@
 #include <filesystem>
 
-#include "scramble.hpp"
-
-#include "utils.hpp"
+#include "info.hpp"
 
 namespace YY 
 {
@@ -10,6 +8,9 @@ namespace YY
 
     void init()
     {
-        YY::PROGRAM_PATH = Utils::getProgramPath();
+        YY::PROGRAM_PATH = Info::getProgramPath();
     }
 }
+
+#include "scramble.hpp"
+#include "cli.hpp"

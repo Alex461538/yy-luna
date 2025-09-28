@@ -26,6 +26,8 @@ namespace YY
             ERR_PROJECT_NO_CONFIG = 0,
             ERR_PROJECT_INVALID_CONFIG = 1,
             ERR_FILE_NOT_FOUND = 2,
+            ERR_DIR_NOT_FOUND = 3,
+            ERR_RESOURCE_UNREACHABLE = 4,
         };
 
         struct Problem
@@ -45,13 +47,19 @@ namespace YY
 
         // Especialización para cada tipo
         template <>
-        Problem problemOf<Type::ERR_PROJECT_NO_CONFIG>(const char *project_path);
+        Problem problemOf<Type::ERR_PROJECT_NO_CONFIG>(const char *path);
 
         template <>
-        Problem problemOf<Type::ERR_PROJECT_INVALID_CONFIG>(const char *project_path, const char *text);
+        Problem problemOf<Type::ERR_PROJECT_INVALID_CONFIG>(const char *path, const char *text);
 
         template <>
-        Problem problemOf<Type::ERR_FILE_NOT_FOUND>(const char *project_path, const char *text);
+        Problem problemOf<Type::ERR_FILE_NOT_FOUND>(const char *path, const char *text);
+
+        template <>
+        Problem problemOf<Type::ERR_DIR_NOT_FOUND>(const char *path, const char *text);
+
+        template <>
+        Problem problemOf<Type::ERR_RESOURCE_UNREACHABLE>(const char *path, const char *text);
     }
 }
 

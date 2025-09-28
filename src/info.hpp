@@ -7,9 +7,12 @@
 
 namespace YY
 {
-    namespace Utils
+    namespace Info
     {
         std::filesystem::path getProgramPath();
+
+        extern const char *OS_NAME;
+        extern const char *ARCH_NAME;
     }
 }
 
