@@ -9,6 +9,8 @@ namespace YY
 {
     namespace Lexer
     {
+        bool textToNumeric(const char *buf, const int16_t len, int64_t& numeric_int, int64_t& numeric_float);
+
         inline bool isWhitespace(char code);
         inline bool isDigit(char code);
         inline bool isAlpha(char code);

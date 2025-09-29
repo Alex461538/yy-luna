@@ -1,4 +1,4 @@
-# ✨ yy (luna) compiler
+# ✨ yy-luna compiler
 
 <img src="images/banner.png" alt="drawing" width="100%" />
 
@@ -62,13 +62,9 @@ cmake -S . -B build
 cmake --build build
 ```
 
-With your specific environment or toolchain, you should grab the required libraries easily for linking. For windows I like vcpkg, and for linux I really like  raw apt, it works somehow.
+With your specific environment or toolchain, you should grab any required libraries easily for linking. For windows I like vcpkg, and for linux I really like  raw apt, it works somehow.
 
-## Check out this 🔥
-
-<div>
-    <strong style="font-size: 16px; display:flex; align-items: center; gap: 5px;" ><img src="images/pet.png" alt="drawing" width="32" />Check out the channel, and eat some cake: <a href="https://youtube.com/@pianitas38" >Tesorito 🌙</a> </strong>
-</div>
+![A nice pet, lunar goat](images/pet.svg)
 
 ## License
 

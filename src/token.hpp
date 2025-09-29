@@ -19,6 +19,7 @@ namespace YY
             T_SEMICOLON,
             T_INVALID,
             T_IDENTIFIER,
+            T_COLON,
             T_PUNCTUATOR,
 
             T_OPEN_PAREN,
@@ -37,11 +38,11 @@ namespace YY
             K_RETURN,
 
             C_NUMBER = T_IS_CONSTANT,
-            C_TRUE,
-            C_FALSE,
+            C_BOOL,
             C_INFINITY,
             C_STRING,
             C_COMMENT,
+            C_NAN,
 
             O_ASSIGN = T_IS_OPERATOR,
             O_PLUS,
@@ -67,10 +68,10 @@ namespace YY
         {
             Location location;
             const char *text;
-            const char *docs;
             int32_t length;
             int32_t enclosing;
-            int32_t docs_length;
+            int64_t numeric_int;
+            int64_t numeric_float;
             Kind kind;
 
             Token();

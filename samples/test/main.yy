@@ -22,6 +22,6 @@ namespace Test {
     
     function main(): i32
     {
-        return 2 + 2 ++= 1 = 0;
+        return true false infinity nan;
     }
 }

@@ -22,9 +22,7 @@ namespace YY
         {
             enclosing = -1;
             text = 0;
-            docs = 0;
             length = 0;
-            docs_length = 0;
             location = Location();
             kind = Kind::T_EOF;
         }
@@ -42,7 +40,12 @@ namespace YY
             {"var", Kind::K_VAR},
             {"class", Kind::K_CLASS},
             {"function", Kind::K_FUNCTION},
-            {"return", Kind::K_RETURN}};
+            {"return", Kind::K_RETURN},
+            {"true", Kind::C_BOOL},
+            {"false", Kind::C_BOOL},
+            {"infinity", Kind::C_INFINITY},
+            {"nan", Kind::C_NAN},
+        };
 
         const std::map<char, Kind> literalTokens = {
             {'(', Kind::T_OPEN_PAREN},
@@ -52,6 +55,7 @@ namespace YY
             {'[', Kind::T_OPEN_SQUARE},
             {']', Kind::T_CLOSE_SQUARE},
             {';', Kind::T_SEMICOLON},
+            {':', Kind::T_COLON},
         };
 
         std::string kindName(Kind kind)
@@ -97,12 +101,18 @@ namespace YY
             case Kind::K_RETURN:
                 return "KW return";
 
+            case Kind::C_BOOL:
+                return "Bool";
+            case Kind::C_INFINITY:
+                return "Inf";
+            case Kind::C_NAN:
+                return "NaN";
             case Kind::C_STRING:
-                return "String literal";
+                return "String";
             case Kind::C_NUMBER:
-                return "Number literal";
+                return "Number";
             case Kind::C_COMMENT:
-                return "Comment literal";
+                return "Comment";
 
             case Kind::O_ASSIGN:
                 return "Assign";
