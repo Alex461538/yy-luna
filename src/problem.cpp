@@ -75,5 +75,25 @@ namespace YY
             p.text = std::format("Resource at path {} can't be resolved. \n{}", std::string(path), std::string(text));
             return p;
         }
+
+        template <>
+        Problem problemOf<Type::ERR_STRAY_PAREN>(const char *path, std::tuple<int32_t, int32_t> location)
+        {
+            Problem p;
+            p.severity = Severity::Error;
+            p.name = "ERR_STRAY_PAREN";
+            p.text = std::format("Unclosed token at {}, line: {} - col: {}.", std::string(path), std::to_string(std::get<0>(location)), std::to_string(std::get<1>(location)));
+            return p;
+        }
+
+        template <>
+        Problem problemOf<Type::ERR_INVALID_TOKEN>(const char *path, std::tuple<int32_t, int32_t> location)
+        {
+            Problem p;
+            p.severity = Severity::Error;
+            p.name = "ERR_INVALID_TOKEN";
+            p.text = std::format("Invalid token at {}, line: {} - col: {}.", std::string(path), std::to_string(std::get<0>(location)), std::to_string(std::get<1>(location)));
+            return p;
+        }
     }
 }

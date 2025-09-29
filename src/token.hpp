@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include <string>
 #include <map>
+#include <format>
 
 namespace YY
 {
@@ -56,8 +57,8 @@ namespace YY
         struct Location
         {
             const char *source;
-            size_t line;
-            size_t column;
+            int32_t line;
+            int32_t column;
 
             Location();
         };
@@ -67,8 +68,9 @@ namespace YY
             Location location;
             const char *text;
             const char *docs;
-            size_t length;
-            size_t docs_length;
+            int32_t length;
+            int32_t enclosing;
+            int32_t docs_length;
             Kind kind;
 
             Token();

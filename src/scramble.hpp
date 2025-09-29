@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <tuple>
 
 #include "lexer.hpp"
 #include "problem.hpp"
@@ -77,6 +78,7 @@ namespace YY
 
             void panic(Problem::Problem problem);
             void loadFromPath(const std::filesystem::path &path);
+            void lex();
 
             operator json() const;
         };

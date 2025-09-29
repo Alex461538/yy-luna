@@ -28,6 +28,8 @@ namespace YY
             ERR_FILE_NOT_FOUND = 2,
             ERR_DIR_NOT_FOUND = 3,
             ERR_RESOURCE_UNREACHABLE = 4,
+            ERR_STRAY_PAREN = 5,
+            ERR_INVALID_TOKEN = 6,
         };
 
         struct Problem
@@ -45,6 +47,9 @@ namespace YY
         template <Type T>
         Problem problemOf(const char *a, const char *b);
 
+        template <Type T>
+        Problem problemOf(const char *a, std::tuple<int32_t, int32_t> location);
+
         // Especialización para cada tipo
         template <>
         Problem problemOf<Type::ERR_PROJECT_NO_CONFIG>(const char *path);
@@ -60,6 +65,12 @@ namespace YY
 
         template <>
         Problem problemOf<Type::ERR_RESOURCE_UNREACHABLE>(const char *path, const char *text);
+
+        template <>
+        Problem problemOf<Type::ERR_STRAY_PAREN>(const char *path, std::tuple<int32_t, int32_t> location);
+
+        template <>
+        Problem problemOf<Type::ERR_INVALID_TOKEN>(const char *path, std::tuple<int32_t, int32_t> location);
     }
 }
 

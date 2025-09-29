@@ -25,7 +25,6 @@ namespace YY
 
             Lexer()
             {
-                std::cout << "Constructed lexer";
                 content = nullptr;
                 cursor = 0;
                 line = 0;

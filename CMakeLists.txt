@@ -5,12 +5,16 @@ set(CMAKE_CXX_STANDARD 23)
 
 cmake_policy(SET CMP0072 NEW)
 
-find_package(OpenGL REQUIRED)
+# find_package(OpenGL REQUIRED)
 
 add_executable(yy-luna 
     src/main.cpp
 
     src/scramble.cpp
+    src/scramble.workspace.cpp
+    src/scramble.project.cpp
+    src/scramble.file.cpp
+
     src/problem.cpp
     src/info.cpp
     src/cli.cpp
