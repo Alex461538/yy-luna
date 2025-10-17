@@ -1,9 +1,11 @@
 import Std from "std";
 import Truetype from "truetype";
 
-import Truetype as Truetype_legacy "truetype:0.1.0";
+import Truetype as Truetype_legacy, Nonas, maldito as puto from "truetype:0.1.0";
 
 import Sub from "sub/sub.yy";
+
+import z import x from "y"
 
 namespace Test {
     namespace LZW {

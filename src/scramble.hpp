@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 #include <tuple>
+#include <utility>
 
 #include "lexer.hpp"
 #include "problem.hpp"
@@ -79,6 +80,16 @@ namespace YY
             void panic(Problem::Problem problem);
             void loadFromPath(const std::filesystem::path &path);
             void lex();
+
+            void preprocess();
+
+            /*
+            Applies all preprocessing queued operations to the file's token stream.
+            This includes:
+                - Import resolution
+                - Branching (conditional compilation)
+            */
+            void flatten();
 
             operator json() const;
         };

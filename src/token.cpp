@@ -36,6 +36,7 @@ namespace YY
         const std::map<std::string, Kind> keywordTokens = {
             {"import", Kind::K_IMPORT},
             {"as", Kind::K_AS},
+            {"from", Kind::K_FROM},
             {"namespace", Kind::K_NAMESPACE},
             {"var", Kind::K_VAR},
             {"class", Kind::K_CLASS},
@@ -56,6 +57,7 @@ namespace YY
             {']', Kind::T_CLOSE_SQUARE},
             {';', Kind::T_SEMICOLON},
             {':', Kind::T_COLON},
+            {',', Kind::T_COMMA},
         };
 
         std::string kindName(Kind kind)

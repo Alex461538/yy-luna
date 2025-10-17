@@ -33,6 +33,13 @@ Any lower layer could not be so important as long as it respects the upper provi
 
 The compilation process (Layer use) is managed by an external entity via predefined pipelines or manual instructions.
 
+
+First what you fucking need?
+
+A loaded workspace from a given path.
+
+
+
 */
 
 int main( int argc, const char **argv )

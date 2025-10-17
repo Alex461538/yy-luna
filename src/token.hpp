@@ -16,6 +16,7 @@ namespace YY
             T_IS_CONSTANT = 0x40'00,
             T_EOF = 0,
 
+            T_COMMA,
             T_SEMICOLON,
             T_INVALID,
             T_IDENTIFIER,
@@ -31,6 +32,7 @@ namespace YY
 
             K_IMPORT,
             K_AS,
+            K_FROM,
             K_NAMESPACE,
             K_VAR,
             K_CLASS,
