@@ -4,7 +4,7 @@ namespace YY
 {
     namespace Scramble
     {
-        void Project::panic(Problem::Problem problem)
+        void Project::panic(std::shared_ptr<Problem::Problem> problem)
         {
             problems.push_back(problem);
         }
@@ -13,14 +13,14 @@ namespace YY
         {
             root_path = path;
 
-            std::printf("Loading workspace from path: %s\n", path.c_str());
+            //std::printf("Loading workspace from path: %s\n", path.c_str());
 
             json yyconf = {};
             std::ifstream file((std::filesystem::path(path) / "yyconf.json").c_str());
 
             if (file.fail())
             {
-                panic(Problem::problemOf<Problem::Type::ERR_PROJECT_NO_CONFIG>(path.c_str()));
+                panic(Problem::WPProblem::get(Problem::Type::ERR_PROJECT_NO_CONFIG, "Config file not found", path.c_str()));
             }
             else
             {
@@ -30,7 +30,7 @@ namespace YY
                 }
                 catch (const std::exception &e)
                 {
-                    panic(Problem::problemOf<Problem::Type::ERR_PROJECT_INVALID_CONFIG>(path.c_str(), e.what()));
+                    panic(Problem::WPProblem::get(Problem::Type::ERR_PROJECT_INVALID_CONFIG, e.what(), path.c_str()));
                 }
             }
 
@@ -45,7 +45,7 @@ namespace YY
                 else
                 {
                     name = path.filename().string();
-                    panic(Problem::problemOf<Problem::Type::ERR_PROJECT_INVALID_CONFIG>(path.c_str(), "Project name is missing or not a string."));
+                    panic(Problem::WPProblem::get(Problem::Type::ERR_PROJECT_INVALID_CONFIG, "Project name is missing or not a string", path.c_str()));
                 }
 
                 if (yyconf.contains("main") && yyconf["main"].is_string())
@@ -56,12 +56,12 @@ namespace YY
                     if (!std::filesystem::exists(main_path))
                     {
                         main_path = "";
-                        panic(Problem::problemOf<Problem::Type::ERR_FILE_NOT_FOUND>(main_path.c_str(), "Main file specified in configuration does not exist."));
+                        panic(Problem::WPProblem::get(Problem::Type::ERR_FILE_NOT_FOUND, "Main file specified in configuration does not exist", path.c_str()));
                     }
                 }
                 else
                 {
-                    panic(Problem::problemOf<Problem::Type::ERR_PROJECT_INVALID_CONFIG>(path.c_str(), "Main file is missing or not a string."));
+                    panic(Problem::WPProblem::get(Problem::Type::ERR_PROJECT_INVALID_CONFIG, "Main file is missing or not a string", path.c_str()));
                 }
 
                 if (yyconf.contains("author") && yyconf["author"].is_string())
@@ -80,8 +80,8 @@ namespace YY
                 }
                 else
                 {
-                    version = "0.1.0";
-                    panic(Problem::problemOf<Problem::Type::ERR_PROJECT_INVALID_CONFIG>(path.c_str(), "Project version is missing or not a string."));
+                    version = "0.0.1";
+                    panic(Problem::WPProblem::get(Problem::Type::ERR_PROJECT_INVALID_CONFIG, "Version is missing or not a string", path.c_str()));
                 }
 
                 if (yyconf.contains("keywords") && yyconf["keywords"].is_array())
@@ -112,7 +112,7 @@ namespace YY
             }
             else
             {
-                panic(Problem::problemOf<Problem::Type::ERR_PROJECT_INVALID_CONFIG>(path.c_str(), "Configuration file is empty."));
+                panic(Problem::WPProblem::get(Problem::Type::ERR_PROJECT_INVALID_CONFIG, "Configuration file is empty", path.c_str()));
             }
         }
 
@@ -142,7 +142,7 @@ namespace YY
 
             for (auto &p : problems)
             {
-                aprobs.push_back(std::string(p));
+                aprobs.push_back(std::string(*p));
             }
 
             for (auto &f : files)

@@ -4,6 +4,11 @@ namespace YY
 {
     namespace Scramble
     {
+        void File::panic(std::shared_ptr<Problem::Problem> problem)
+        {
+            problems.push_back(problem);
+        }
+
         void File::lex()
         {
             tokens.clear();
@@ -44,7 +49,7 @@ namespace YY
                     tokens[std::get<1>(pair)].enclosing = tokens.size() - 1;
                     if (std::get<0>(pair) != '(')
                     {
-                        panic(Problem::problemOf<Problem::Type::ERR_STRAY_PAREN>(path.c_str(), {token.location.column, token.location.line}));
+                        panic(Problem::FileProblem::get(Problem::Type::ERR_STRAY_PAREN, ") expected", path.c_str(), {token.location.line, token.location.column}));
                     }
                     brackets.pop_back();
                 }
@@ -55,7 +60,7 @@ namespace YY
                     tokens[std::get<1>(pair)].enclosing = tokens.size() - 1;
                     if (std::get<0>(pair) != '{')
                     {
-                        panic(Problem::problemOf<Problem::Type::ERR_STRAY_PAREN>(path.c_str(), {token.location.column, token.location.line}));
+                        panic(Problem::FileProblem::get(Problem::Type::ERR_STRAY_PAREN, "} expected", path.c_str(), {token.location.line, token.location.column}));
                     }
                     brackets.pop_back();
                 }
@@ -66,14 +71,14 @@ namespace YY
                     tokens[std::get<1>(pair)].enclosing = tokens.size() - 1;
                     if (std::get<0>(pair) != '[')
                     {
-                        panic(Problem::problemOf<Problem::Type::ERR_STRAY_PAREN>(path.c_str(), {token.location.column, token.location.line}));
+                        panic(Problem::FileProblem::get(Problem::Type::ERR_STRAY_PAREN, "] expected", path.c_str(), {token.location.line, token.location.column}));
                     }
                     brackets.pop_back();
                 }
                 break;
                 case Token::Kind::T_INVALID:
                 {
-                    panic(Problem::problemOf<Problem::Type::ERR_INVALID_TOKEN>(path.c_str(), {token.location.column, token.location.line}));
+                    panic(Problem::FileProblem::get(Problem::Type::ERR_INVALID_TOKEN, "Invalid token at lexing: " + std::string(token.text, token.length), path.c_str(), {token.location.line, token.location.column}));
                 }
                 break;
                 default:
@@ -84,11 +89,6 @@ namespace YY
             }
 
             tokens.push_back(token);
-        }
-
-        void File::panic(Problem::Problem problem)
-        {
-            problems.push_back(problem);
         }
 
         void File::loadFromPath(const std::filesystem::path &path)
@@ -106,7 +106,8 @@ namespace YY
             }
             else
             {
-                panic(Problem::problemOf<Problem::Type::ERR_FILE_NOT_FOUND>(path.c_str(), "This file does not exist or is not readable."));
+                panic(Problem::WPProblem::get(Problem::Type::ERR_FILE_NOT_FOUND, "This file does not exist or is not readable", path.c_str()));
+                return;
             }
 
             lex();
@@ -131,7 +132,7 @@ namespace YY
 
             for (auto &p : problems)
             {
-                aprobs.push_back(std::string(p));
+                aprobs.push_back(std::string(*p));
             }
 
             for (auto &t : tokens)
@@ -170,7 +171,7 @@ namespace YY
                         if (symbolName.kind != Token::Kind::T_IDENTIFIER)
                         {
                             index--; // Prevent phantom consumption
-                            panic(Problem::problemOf<Problem::Type::ERR_INVALID_TOKEN>(path.c_str(), {symbolName.location.column, symbolName.location.line}));
+                            panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<identifier> expected", path.c_str(), {token.location.line, token.location.column}));
                             break;
                         }
 
@@ -189,7 +190,7 @@ namespace YY
                             if (aliasName.kind != Token::Kind::T_IDENTIFIER)
                             {
                                 index--; // Prevent phantom consumption
-                                panic(Problem::problemOf<Problem::Type::ERR_INVALID_TOKEN>(path.c_str(), {aliasName.location.column, aliasName.location.line}));
+                                panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<identifier> expected", path.c_str(), {token.location.line, token.location.column}));
                                 break;
                             }
                             // Peek for from | ,
@@ -240,7 +241,7 @@ namespace YY
                             else
                             {
                                 index--; // Prevent phantom consumption
-                                panic(Problem::problemOf<Problem::Type::ERR_INVALID_TOKEN>(path.c_str(), {pathToken.location.column, pathToken.location.line}));
+                                panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<string lit> expected", path.c_str(), {token.location.line, token.location.column}));
                                 continue;
                             }
 
@@ -249,7 +250,7 @@ namespace YY
                         else
                         {
                             index--; // Prevent phantom consumption
-                            panic(Problem::problemOf<Problem::Type::ERR_INVALID_TOKEN>(path.c_str(), {tk_from_as_comma.location.column, tk_from_as_comma.location.line}));
+                            panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, ", | <from> expected", path.c_str(), {token.location.line, token.location.column}));
                             break;
                         }
                     }

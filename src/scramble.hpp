@@ -31,9 +31,9 @@ namespace YY
 
             std::vector<std::shared_ptr<Project>> projects;
 
-            std::vector<Problem::Problem> problems;
+            std::vector<std::shared_ptr<Problem::Problem>> problems;
 
-            void panic(Problem::Problem problem);
+            void panic(std::shared_ptr<Problem::Problem> problem);
             void loadFromPath(const std::filesystem::path &path);
 
             void addProject(const std::filesystem::path &path);
@@ -55,9 +55,9 @@ namespace YY
             std::vector<std::string> keywords;
 
             std::vector<std::shared_ptr<File>> files;
-            std::vector<Problem::Problem> problems;
+            std::vector<std::shared_ptr<Problem::Problem>> problems;
 
-            void panic(Problem::Problem problem);
+            void panic(std::shared_ptr<Problem::Problem> problem);
             void loadFromPath(const std::filesystem::path &path);
 
             operator json() const;
@@ -72,12 +72,12 @@ namespace YY
 
             std::string content;
 
-            std::vector<Problem::Problem> problems;
             std::vector<std::shared_ptr<File>> imports;
+            std::vector<std::shared_ptr<Problem::Problem>> problems;
 
             std::vector<Token::Token> tokens; 
 
-            void panic(Problem::Problem problem);
+            void panic(std::shared_ptr<Problem::Problem> problem);
             void loadFromPath(const std::filesystem::path &path);
             void lex();
 

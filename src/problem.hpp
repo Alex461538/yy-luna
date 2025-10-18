@@ -3,6 +3,9 @@
 
 #include <string>
 #include <format>
+#include <map>
+#include <utility>
+#include <memory>
 
 namespace YY
 {
@@ -21,7 +24,7 @@ namespace YY
             Error = 2
         };
 
-        enum class Type
+        enum class Type : int16_t
         {
             ERR_PROJECT_NO_CONFIG = 0,
             ERR_PROJECT_INVALID_CONFIG = 1,
@@ -30,47 +33,45 @@ namespace YY
             ERR_RESOURCE_UNREACHABLE = 4,
             ERR_STRAY_PAREN = 5,
             ERR_INVALID_TOKEN = 6,
+            ERR_EXPECTED = 7
         };
 
-        struct Problem
+        extern std::map<Type, std::string> TypeNames;
+
+        class Problem
         {
-            Severity severity;
-            std::string name;
+        public:
+            std::string source;
             std::string text;
+            
+            int32_t line = -1;
+            int16_t column = -1;
+            Type type;
+            Severity severity;
+
+            std::string levelToString() const;
+            std::string typeToString() const;
+
+            virtual std::string asText() const;
 
             operator std::string() const;
         };
 
-        template <Type T>
-        Problem problemOf(const char *a);
+        class WPProblem : public Problem
+        {
+        public:
+            std::string asText() const;
 
-        template <Type T>
-        Problem problemOf(const char *a, const char *b);
+            static std::shared_ptr<WPProblem> get(Type type, std::string text, std::string source);
+        };
 
-        template <Type T>
-        Problem problemOf(const char *a, std::tuple<int32_t, int32_t> location);
+        class FileProblem : public Problem
+        {
+        public:
+            std::string asText() const;
 
-        // Especialización para cada tipo
-        template <>
-        Problem problemOf<Type::ERR_PROJECT_NO_CONFIG>(const char *path);
-
-        template <>
-        Problem problemOf<Type::ERR_PROJECT_INVALID_CONFIG>(const char *path, const char *text);
-
-        template <>
-        Problem problemOf<Type::ERR_FILE_NOT_FOUND>(const char *path, const char *text);
-
-        template <>
-        Problem problemOf<Type::ERR_DIR_NOT_FOUND>(const char *path, const char *text);
-
-        template <>
-        Problem problemOf<Type::ERR_RESOURCE_UNREACHABLE>(const char *path, const char *text);
-
-        template <>
-        Problem problemOf<Type::ERR_STRAY_PAREN>(const char *path, std::tuple<int32_t, int32_t> location);
-
-        template <>
-        Problem problemOf<Type::ERR_INVALID_TOKEN>(const char *path, std::tuple<int32_t, int32_t> location);
+            static std::shared_ptr<FileProblem> get(Type type, std::string text, std::string source, std::pair<int16_t, int32_t> location);
+        };
     }
 }
 

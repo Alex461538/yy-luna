@@ -4,6 +4,11 @@ namespace YY
 {
     namespace Scramble
     {
+        void Workspace::panic(std::shared_ptr<Problem::Problem> problem)
+        {
+            problems.push_back(problem);
+        }
+
         void Workspace::loadFromPath(const std::filesystem::path &path)
         {
             root_path = path;
@@ -14,11 +19,11 @@ namespace YY
         {
             if (!path.is_absolute())
             {
-                panic(Problem::problemOf<Problem::Type::ERR_RESOURCE_UNREACHABLE>(path.c_str(), "A project can't be resolved from a relative path"));
+                panic(Problem::WPProblem::get(Problem::Type::ERR_RESOURCE_UNREACHABLE, "A project can't be resolved from a relative path", path.c_str()));
             }
             else if (!std::filesystem::is_directory(path) || !std::filesystem::exists(path))
             {
-                panic(Problem::problemOf<Problem::Type::ERR_DIR_NOT_FOUND>(path.c_str(), "This is not a valid project path."));
+                panic(Problem::WPProblem::get(Problem::Type::ERR_DIR_NOT_FOUND, "This is not a valid project path", path.c_str()));
             }
             else
             {
@@ -27,11 +32,6 @@ namespace YY
                 projects.push_back(project);
                 project.get()->loadFromPath(path);
             }
-        }
-
-        void Workspace::panic(Problem::Problem problem)
-        {
-            problems.push_back(problem);
         }
 
         Workspace::operator json() const
@@ -47,7 +47,7 @@ namespace YY
 
             for (auto &p : problems)
             {
-                aprobs.push_back(std::string(p));
+                aprobs.push_back(std::string(*p));
             }
 
             for (auto &p : projects)
