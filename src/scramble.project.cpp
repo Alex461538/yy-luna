@@ -136,15 +136,96 @@ namespace YY
             }
         }
 
+        Package *Project::searchPackage(ImportDependency *dependency)
+        {
+            // TODO OPTIONAL: Support semver ranges
+
+            if (dependency == nullptr)
+            {
+                return nullptr;
+            }
+
+            semver::version version;
+            bool valid_version = semver::parse(dependency->version, version);
+
+            semver::version candidate_version;
+            bool valid_can_ver = false;
+
+            semver::version temp_ver;
+            bool valid_temp_ver = false;
+
+            Package *candidate_package = nullptr;
+
+            for (auto &pkg : packages)
+            {
+                if (pkg.name == dependency->path)
+                {
+                    if (!valid_version)
+                    {
+                        valid_temp_ver = semver::parse(pkg.version, temp_ver);
+                        // Grab the newest
+                        if (candidate_package == nullptr || (candidate_package && valid_can_ver && valid_temp_ver && candidate_version < temp_ver))
+                        {
+                            candidate_package = &pkg;
+                            valid_can_ver = semver::parse(candidate_package->version, candidate_version);
+                        }
+                    }
+                    else if (pkg.version == dependency->version)
+                    {
+                        // Grab this only
+                        candidate_package = &pkg;
+                        break;
+                    }
+                }
+            }
+
+            return candidate_package;
+        }
+
+        void Project::resolveFromFile(ImportDependency *dependency, File *from = nullptr)
+        {
+            if (dependency == nullptr || from == nullptr)
+            {
+                return;
+            }
+
+            Package *candidate_package = searchPackage(dependency);
+
+            if (candidate_package)
+            {
+                dependency->version = candidate_package->version;
+
+                if (owner_workspace)
+                {
+                    owner_workspace->resolveProject(dependency);
+                }
+            }
+            else
+            {
+                // TODO check if a path is only inside the project
+                auto abs_path = from->path.parent_path() / std::filesystem::path(dependency->path);
+
+                dependency->attachFile(
+                    addFile(abs_path.c_str()));
+            }
+        }
+
         std::shared_ptr<File> Project::addFile(std::string abs_path)
         {
-            // TODO: PLEASE PLEASE CHECK IF IT IS ALREADY LOADED FIRST
-            std::printf("Adding file at: %s\n", abs_path.c_str());
-            auto file = std::make_shared<File>();
-            file.get()->owner_project = this;
-            files.push_back(file);
-            file.get()->loadFromPath(abs_path);
-            return file;
+            // Thanks
+            auto prev = files.find(std::string(abs_path));
+            if (prev != files.end())
+            {
+                return prev->second;
+            }
+            else
+            {
+                auto file = std::make_shared<File>();
+                file.get()->owner_project = this;
+                files[abs_path] = file;
+                file.get()->loadFromPath(abs_path);
+                return file;
+            }
         }
 
         Package::operator std::string() const
@@ -188,9 +269,9 @@ namespace YY
                 aprobs.push_back(std::string(*p));
             }
 
-            for (auto &f : files)
+            for (const auto &[key, value] : files)
             {
-                afiles.push_back( json(*f.get()) );
+                afiles.push_back( json(*value.get()) );
             }
 
             return data;

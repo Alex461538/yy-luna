@@ -11,6 +11,7 @@
 #include <utility>
 #include <map>
 #include <format>
+#include <set>
 
 #include "lexer.hpp"
 #include "problem.hpp"
@@ -35,14 +36,14 @@ namespace YY
         {
             std::filesystem::path root_path;
 
-            std::vector<std::shared_ptr<Project>> projects;
+            std::map<std::string, std::shared_ptr<Project>> projects;
 
             std::vector<std::shared_ptr<Problem::Problem>> problems;
 
             void panic(std::shared_ptr<Problem::Problem> problem);
             void loadFromPath(const std::filesystem::path &path);
 
-            void addProject(const std::filesystem::path &path);
+            std::shared_ptr<Project> addProject(const std::filesystem::path &path);
 
             void resolveProject(ImportDependency *dependency);
 
@@ -73,7 +74,7 @@ namespace YY
             std::vector<std::string> keywords;
             std::vector<Package>packages;
 
-            std::vector<std::shared_ptr<File>> files;
+            std::map<std::string, std::shared_ptr<File>> files;
             std::vector<std::shared_ptr<Problem::Problem>> problems;
 
             void panic(std::shared_ptr<Problem::Problem> problem);
@@ -135,15 +136,26 @@ namespace YY
 
         struct ImportDependency
         {
+            enum class ImportType {
+                IPT_NONE,
+                IPT_FILE,
+                IPT_PROJ,
+                IPT_LINK // Imagine importing binary libs!
+            };
+
             std::string version;
             std::string path;
-            bool is_project;
+
+            ImportType type;
+            std::shared_ptr<void> target;
 
             ImportDependency();
             ImportDependency(std::string _path);
 
             void attachFile(std::shared_ptr<File> target);
             void attachProject(std::shared_ptr<Project> target);
+
+            operator std::string() const;
         };
 
         Workspace pathToWorkspace(const std::filesystem::path &path);
