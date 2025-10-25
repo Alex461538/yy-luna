@@ -2,6 +2,9 @@
 
 namespace YY
 {
+    std::filesystem::path PROGRAM_PATH = "";
+    std::filesystem::path HOME_PATH = "";
+
     namespace Info
     {
 #if defined(__unix__) || defined(__unix) || \

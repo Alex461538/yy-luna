@@ -7,6 +7,9 @@
 
 namespace YY
 {
+    extern std::filesystem::path PROGRAM_PATH;
+    extern std::filesystem::path HOME_PATH;
+
     namespace Info
     {
         std::filesystem::path getProgramPath();

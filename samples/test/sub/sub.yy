@@ -1,3 +1,3 @@
-import "std"
+import Std from "std"
 
 namespace Sub {}

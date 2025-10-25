@@ -95,6 +95,29 @@ namespace YY
                     }
                 }
 
+                if (yyconf.contains("packages") && yyconf["packages"].is_array())
+                {
+                    for (const auto &package : yyconf["packages"])
+                    {
+                        if (package.is_object())
+                        {
+                            Package pkg;
+
+                            if (package.contains("name") and package["name"].is_string())
+                            {
+                                pkg.name = package["name"];
+                            }
+
+                            if (package.contains("version") and package["version"].is_string())
+                            {
+                                pkg.version = package["version"];
+                            }
+
+                            packages.push_back(pkg);
+                        }
+                    }
+                }
+
                 if (!main_path.empty())
                 {
                     auto abs_path = std::filesystem::path(main_path);
@@ -104,16 +127,29 @@ namespace YY
                         abs_path = root_path / main_path;
                     }
 
-                    auto file = std::make_shared<File>();
-                    file.get()->owner_project = this;
-                    files.push_back(file);
-                    file.get()->loadFromPath(abs_path);
+                    addFile(abs_path.c_str());
                 }
             }
             else
             {
                 panic(Problem::WPProblem::get(Problem::Type::ERR_PROJECT_INVALID_CONFIG, "Configuration file is empty", path.c_str()));
             }
+        }
+
+        std::shared_ptr<File> Project::addFile(std::string abs_path)
+        {
+            // TODO: PLEASE PLEASE CHECK IF IT IS ALREADY LOADED FIRST
+            std::printf("Adding file at: %s\n", abs_path.c_str());
+            auto file = std::make_shared<File>();
+            file.get()->owner_project = this;
+            files.push_back(file);
+            file.get()->loadFromPath(abs_path);
+            return file;
+        }
+
+        Package::operator std::string() const
+        {
+            return std::format("{} <{}>", name, version.empty() ? "?" : version);
         }
 
         Project::operator json() const
@@ -130,14 +166,21 @@ namespace YY
             data["problems"] = json::array();
             data["keywords"] = json::array();
             data["files"] = json::array();
+            data["packages"] = json::array();
 
             auto &aprobs = data.at("problems");
             auto &akeys = data.at("keywords");
             auto &afiles = data.at("files");
+            auto &apacks = data.at("packages");
+
+            for (auto &p : packages)
+            {
+                apacks.push_back(std::string(p));
+            }
 
             for (auto &k : keywords)
             {
-                akeys.push_back(std::string(k));
+                akeys.push_back(k);
             }
 
             for (auto &p : problems)

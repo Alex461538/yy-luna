@@ -10,11 +10,14 @@
 #include <tuple>
 #include <utility>
 #include <map>
+#include <format>
 
 #include "lexer.hpp"
 #include "problem.hpp"
+#include "info.hpp"
 
 #include <json.hpp>
+#include <semver.hpp>
 
 using json = nlohmann::json;
 
@@ -23,8 +26,10 @@ namespace YY
     namespace Scramble
     {
         struct Workspace;
+        struct Package;
         struct Project;
         struct File;
+        struct ImportDependency;
 
         struct Workspace
         {
@@ -39,7 +44,16 @@ namespace YY
 
             void addProject(const std::filesystem::path &path);
 
+            void resolveProject(ImportDependency *dependency);
+
             operator json() const;
+        };
+
+        struct Package {
+            std::string name;
+            std::string version;
+
+            operator std::string() const;
         };
 
         struct Project
@@ -53,7 +67,11 @@ namespace YY
             std::string description;
             std::string author;
             std::string main_path;
+
+            std::shared_ptr<File> main;
+
             std::vector<std::string> keywords;
+            std::vector<Package>packages;
 
             std::vector<std::shared_ptr<File>> files;
             std::vector<std::shared_ptr<Problem::Problem>> problems;
@@ -62,19 +80,17 @@ namespace YY
             void loadFromPath(const std::filesystem::path &path);
 
             operator json() const;
+
+            void resolveFromFile(ImportDependency *dependency, File *from);
+
+            std::shared_ptr<File> addFile(std::string abs_path);
+
+            Package *searchPackage(ImportDependency *dependency);
         };
 
         struct File
         {
-            struct Dependency {
-                std::string version;
-                std::string path;
-
-                Dependency();
-                Dependency(std::string _path);
-            };
-
-            Project* owner_project;
+            Project *owner_project;
 
             std::filesystem::path path;
             std::filesystem::path relative_path;
@@ -83,13 +99,15 @@ namespace YY
 
             std::vector<std::shared_ptr<Problem::Problem>> problems;
 
-            std::vector<Token::Token> tokens; 
+            std::vector<Token::Token> tokens;
 
-            std::vector<Dependency> dependencies;
+            std::vector<ImportDependency> dependencies;
             std::map<std::string, std::pair<std::string, size_t>> importNamespaces;
 
             size_t addDependency(std::string query);
             void importNamespace(size_t dependency, std::string name, std::string alias);
+
+            void resolve(size_t dependency);
 
             void panic(std::shared_ptr<Problem::Problem> problem);
             void loadFromPath(const std::filesystem::path &path);
@@ -113,6 +131,19 @@ namespace YY
             void flatten();
 
             operator json() const;
+        };
+
+        struct ImportDependency
+        {
+            std::string version;
+            std::string path;
+            bool is_project;
+
+            ImportDependency();
+            ImportDependency(std::string _path);
+
+            void attachFile(std::shared_ptr<File> target);
+            void attachProject(std::shared_ptr<Project> target);
         };
 
         Workspace pathToWorkspace(const std::filesystem::path &path);
@@ -143,11 +174,11 @@ If a file imports another thing, it tells the project to resolve it:
 
 Resolvers for those operations could be found in the classes, or be in a resolver file
 
-One thing i thought about, for avoiding conflicts and making everything easier, 
-is isolating dependencies, for instance, if A->B & B->C then A-/->C, 
-unless A explicitly imports it. 
-Each file should export namespaces (variables in their global namespace are private), 
-and each requester, imports the desired namespaces. 
+One thing i thought about, for avoiding conflicts and making everything easier,
+is isolating dependencies, for instance, if A->B & B->C then A-/->C,
+unless A explicitly imports it.
+Each file should export namespaces (variables in their global namespace are private),
+and each requester, imports the desired namespaces.
 
 import Std from "std";
 import Truetype from "truetype";

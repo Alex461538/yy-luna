@@ -24,7 +24,7 @@ import "ines.yy"
 @section "STARTUP" {
     @func.no_frame
     function main(): void {
-        INES.Reset();
+        INES.reset();
 
         while (true) {
             /* Main loop */

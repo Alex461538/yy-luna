@@ -17,6 +17,8 @@ namespace YY
 
         void Workspace::addProject(const std::filesystem::path &path)
         {
+            std::printf("Project!:  %s\n", path.c_str());
+
             if (!path.is_absolute())
             {
                 panic(Problem::WPProblem::get(Problem::Type::ERR_RESOURCE_UNREACHABLE, "A project can't be resolved from a relative path", path.c_str()));

@@ -4,11 +4,10 @@
 
 namespace YY 
 {
-    std::filesystem::path PROGRAM_PATH;
-
     void init()
     {
         YY::PROGRAM_PATH = Info::getProgramPath();
+        YY::HOME_PATH = PROGRAM_PATH.parent_path() / "../";
     }
 }
 

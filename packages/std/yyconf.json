@@ -1,0 +1,9 @@
+{
+    "name": "std",
+    "version": "1.0.0",
+    "description": "YY std library",
+    "keywords": [],
+    "author": "Alex",
+    "main": "main.yy",
+    "packages": []
+}
