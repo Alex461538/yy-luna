@@ -70,11 +70,12 @@ namespace YY
         {
             Location location;
             const char *text;
-            int32_t length;
-            int32_t enclosing;
             int64_t numeric_int;
             int64_t numeric_float;
+            int32_t length;
+            int32_t enclosing;
             Kind kind;
+            bool ignore;
 
             Token();
 

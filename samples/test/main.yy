@@ -5,8 +5,6 @@ import Truetype as Truetype_legacy, Nonas, maldito as puto from "truetype:0.1.0"
 
 import Sub from "sub/sub.yy";
 
-import import x from "y"
-
 namespace Test {
     namespace LZW {
         

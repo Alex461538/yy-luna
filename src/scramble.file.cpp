@@ -143,105 +143,160 @@ namespace YY
             return data;
         }
 
+        File::Dependency::Dependency(){}
+
+        File::Dependency::Dependency(std::string _path)
+        {
+            std::string::size_type version_sepr = _path.find(':');
+            path = _path.substr(0, version_sepr);
+            if (version_sepr != std::string::npos)
+            {
+                version = _path.substr(version_sepr + 1);
+            }
+        }
+
+        size_t File::addDependency(std::string query)
+        {
+            dependencies.push_back( Dependency(query) );
+            return dependencies.size() - 1;
+        }
+
+        void File::importNamespace(size_t dependency, std::string name, std::string alias = "")
+        {
+            if (!alias.empty())
+            {
+                importNamespaces[ alias ] = { name, dependency };
+            }
+            else
+            {
+                importNamespaces[ name ] = { name, dependency };
+            }
+        }
+
         void File::preprocess()
         {
             for (int index = 0; index < tokens.size();)
             {
-                Token::Token &token = tokens[index++];
+                Token::Token *token = &tokens[index++];
 
                 // Verbose output for debugging
                 // std::printf("Processing token: %s\n", std::string(token).c_str());
 
                 // handle import statements
-                if (token.kind == Token::Kind::K_IMPORT)
+                if (token->kind == Token::Kind::K_IMPORT)
                 {
-                    Token::Token symbolName;
-                    Token::Token tk_from_as_comma;
-                    Token::Token aliasName;
-                    Token::Token pathToken;
+                    // mark import
+                    token->ignore = true;
 
-                    std::vector<std::pair<std::string, std::string>> importSymbols; // symbol, alias
+                    Token::Token *symbolName = nullptr;
+                    Token::Token *tk_from_as_comma = nullptr;
+                    Token::Token *aliasName = nullptr;
+                    Token::Token *pathToken = nullptr;
+
+                    std::vector<std::pair<std::string, std::string>> deps;
 
                     // Consume if at least there can be a import <symbol> from "path"
                     while (index + 3 < tokens.size())
                     {
                         // Peek a symbol
-                        symbolName = tokens[index++];
+                        symbolName = &tokens[index++];
                         // Check for identifier
-                        if (symbolName.kind != Token::Kind::T_IDENTIFIER)
+                        if (symbolName->kind != Token::Kind::T_IDENTIFIER)
                         {
                             index--; // Prevent phantom consumption
-                            panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<identifier> expected", path.c_str(), {token.location.line, token.location.column}));
+                            panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<identifier> expected", path.c_str(), {token->location.line, token->location.column}));
                             break;
                         }
 
+                        // mark symbol name
+                        symbolName->ignore = true;
+
                         // Peek for as | from
-                        tk_from_as_comma = tokens[index++];
+                        tk_from_as_comma = &tokens[index++];
 
                         bool hasAlias = false;
 
                         // Check for an alias
-                        if (tk_from_as_comma.kind == Token::Kind::K_AS)
+                        if (tk_from_as_comma->kind == Token::Kind::K_AS)
                         {
+                            // mark as kw
+                            tk_from_as_comma->ignore = true;
+
                             hasAlias = true;
                             // Peek alias
-                            aliasName = tokens[index++];
+                            aliasName = &tokens[index++];
                             // check for identifier
-                            if (aliasName.kind != Token::Kind::T_IDENTIFIER)
+                            if (aliasName->kind != Token::Kind::T_IDENTIFIER)
                             {
                                 index--; // Prevent phantom consumption
-                                panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<identifier> expected", path.c_str(), {token.location.line, token.location.column}));
+                                panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<identifier> expected", path.c_str(), {token->location.line, token->location.column}));
                                 break;
                             }
+
+                            // mark alias name
+                            aliasName->ignore = true;
+
                             // Peek for from | ,
-                            tk_from_as_comma = tokens[index++];
+                            tk_from_as_comma = &tokens[index++];
                         }
 
                         // Store the symbol (with alias if any)
                         if (hasAlias)
                         {
-                            importSymbols.push_back({std::string(symbolName.text, symbolName.length), std::string(aliasName.text, aliasName.length)});
+                            deps.push_back({
+                                std::string(symbolName->text, symbolName->length),
+                                std::string(aliasName->text, aliasName->length)
+                            });
                         }
                         else
                         {
-                            importSymbols.push_back({std::string(symbolName.text, symbolName.length), ""});
+                            deps.push_back({
+                                std::string(symbolName->text, symbolName->length),
+                                ""
+                            });
                         }
 
                         // Check for , | from
-                        if (tk_from_as_comma.kind == Token::Kind::T_COMMA)
+                        if (tk_from_as_comma->kind == Token::Kind::T_COMMA)
                         {
+                            // mark comma
+                            tk_from_as_comma->ignore = true;
+
                             // continue to next symbol
                             continue;
                         }
-                        else if (tk_from_as_comma.kind == Token::Kind::K_FROM)
+                        else if (tk_from_as_comma->kind == Token::Kind::K_FROM)
                         {
-                            pathToken = tokens[index++];
+                            // mark from
+                            tk_from_as_comma->ignore = true;
 
-                            if (pathToken.kind == Token::Kind::C_STRING)
+                            pathToken = &tokens[index++];
+
+                            if (pathToken->kind == Token::Kind::C_STRING)
                             {
-                                std::string importPath(pathToken.text, pathToken.length);
+                                // mark path
+                                pathToken->ignore = true;
+
+                                std::string importPath(pathToken->text, pathToken->length);
                                 // Remove quotes
                                 if (importPath.size() >= 2 && importPath.front() == '"' && importPath.back() == '"')
                                 {
                                     importPath = importPath.substr(1, importPath.size() - 2);
                                 }
 
-                                std::printf("Importing from file: %s\n", importPath.c_str());
+                                //std::printf("Importing from file: %s\n", importPath.c_str());
 
-                                for (auto &sympair : importSymbols)
+                                size_t dependency = addDependency(importPath);
+
+                                for (auto &sympair : deps)
                                 {
-                                    std::printf("  symbol: %s", sympair.first.c_str());
-                                    if (!sympair.second.empty())
-                                    {
-                                        std::printf(" as %s", sympair.second.c_str());
-                                    }
-                                    std::printf("\n");
+                                    importNamespace(dependency, sympair.first, sympair.second);
                                 }
                             }
                             else
                             {
                                 index--; // Prevent phantom consumption
-                                panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<string lit> expected", path.c_str(), {token.location.line, token.location.column}));
+                                panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<string lit> expected", path.c_str(), {token->location.line, token->location.column}));
                                 continue;
                             }
 
@@ -250,7 +305,7 @@ namespace YY
                         else
                         {
                             index--; // Prevent phantom consumption
-                            panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, ", | <from> expected", path.c_str(), {token.location.line, token.location.column}));
+                            panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, ", | <from> expected", path.c_str(), {token->location.line, token->location.column}));
                             break;
                         }
                     }
@@ -260,7 +315,12 @@ namespace YY
 
         void File::flatten()
         {
-            //
+            for (auto &names : importNamespaces)
+            {
+                printf("%s %s \n", names.first.c_str(), names.second.first.c_str());
+
+                printf("%s %s \n", dependencies[names.second.second].version.c_str(), dependencies[names.second.second].path.c_str());
+            }
         }
     }
 }

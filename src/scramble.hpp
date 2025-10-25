@@ -9,6 +9,7 @@
 #include <memory>
 #include <tuple>
 #include <utility>
+#include <map>
 
 #include "lexer.hpp"
 #include "problem.hpp"
@@ -65,6 +66,14 @@ namespace YY
 
         struct File
         {
+            struct Dependency {
+                std::string version;
+                std::string path;
+
+                Dependency();
+                Dependency(std::string _path);
+            };
+
             Project* owner_project;
 
             std::filesystem::path path;
@@ -72,16 +81,28 @@ namespace YY
 
             std::string content;
 
-            std::vector<std::shared_ptr<File>> imports;
             std::vector<std::shared_ptr<Problem::Problem>> problems;
 
             std::vector<Token::Token> tokens; 
+
+            std::vector<Dependency> dependencies;
+            std::map<std::string, std::pair<std::string, size_t>> importNamespaces;
+
+            size_t addDependency(std::string query);
+            void importNamespace(size_t dependency, std::string name, std::string alias);
 
             void panic(std::shared_ptr<Problem::Problem> problem);
             void loadFromPath(const std::filesystem::path &path);
             void lex();
 
             void preprocess();
+
+            /*
+            Dependencias: Enlaces hacia otros archivos o proyectos
+
+            diccionario de namespaces -> índices de importe
+            array de importes -> Información de dependencia local
+            */
 
             /*
             Applies all preprocessing queued operations to the file's token stream.

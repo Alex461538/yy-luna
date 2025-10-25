@@ -20,6 +20,7 @@ namespace YY
 
         Token::Token()
         {
+            ignore = false;
             enclosing = -1;
             text = 0;
             length = 0;
@@ -129,7 +130,7 @@ namespace YY
 
         Token::operator std::string() const
         {
-            return std::format("{} <{}> L:{} C:{} e:{}", (text ? std::string(text, length) : ""), kindName(kind), std::to_string(location.line), std::to_string(location.column), std::to_string(enclosing));
+            return std::format("I: {} L:{} C:{} e:{} {} <{}>", std::to_string((int8_t)ignore), std::to_string(location.line), std::to_string(location.column), std::to_string(enclosing), (text ? std::string(text, length) : ""), kindName(kind));
         }
     }
 }
