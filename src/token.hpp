@@ -47,6 +47,7 @@ namespace YY
             C_NAN,
 
             O_ASSIGN = T_IS_OPERATOR,
+            O_ACCESS,
             O_PLUS,
             O_PLUS_EQ
         };

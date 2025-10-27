@@ -150,9 +150,9 @@ namespace YY
             return data;
         }
 
-        ImportDependency::ImportDependency(){}
+        ImportQuery::ImportQuery(){}
 
-        ImportDependency::ImportDependency(std::string _path)
+        ImportQuery::ImportQuery(std::string _path)
         {
             std::string::size_type version_sepr = _path.find(':');
             path = _path.substr(0, version_sepr);
@@ -162,7 +162,7 @@ namespace YY
             }
         }
 
-        ImportDependency::operator std::string() const
+        ImportQuery::operator std::string() const
         {
             // This WILL cause a lot of problems
             std::string abs_path;
@@ -172,7 +172,7 @@ namespace YY
             }
             else if (type == ImportType::IPT_PROJ)
             {
-                abs_path = ((Project*)target.get())->root_path;
+                abs_path = ((Tree*)target.get())->root_path;
             }
             return std::format("{} <{}> {} {}", path, version.empty() ? "?" : version, std::to_string((int)type), abs_path);
         }
@@ -182,7 +182,7 @@ namespace YY
             // Shoul i care too much of duplicate deps here?
             // Oh, FIX DUP NAMESPACES FOR NOW
             // PaThS LaTeR
-            dependencies.push_back(ImportDependency(query));
+            dependencies.push_back(ImportQuery(query));
             return dependencies.size() - 1;
         }
 
@@ -334,14 +334,14 @@ namespace YY
             }
         }
 
-        void ImportDependency::attachFile(std::shared_ptr<File> target) 
+        void ImportQuery::attachFile(std::shared_ptr<File> target) 
         {
             //
             type = ImportType::IPT_FILE;
             this->target = target;
         }
 
-        void ImportDependency::attachProject(std::shared_ptr<Project> target) 
+        void ImportQuery::attachProject(std::shared_ptr<Tree> target) 
         {
             //
             type = ImportType::IPT_PROJ;

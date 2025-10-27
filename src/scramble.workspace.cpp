@@ -15,7 +15,7 @@ namespace YY
             addProject(path);
         }
 
-        std::shared_ptr<Project> Workspace::addProject(const std::filesystem::path &path)
+        std::shared_ptr<Tree> Workspace::addProject(const std::filesystem::path &path)
         {
             if (!path.is_absolute())
             {
@@ -34,7 +34,7 @@ namespace YY
                 }
                 else
                 {
-                    auto project = std::make_shared<Project>();
+                    auto project = std::make_shared<Tree>();
                     project.get()->owner_workspace = this;
                     projects[path] = project;
                     project.get()->loadFromPath(path);
@@ -42,7 +42,7 @@ namespace YY
                 }
             }
 
-            return std::make_shared<Project>();
+            return std::make_shared<Tree>();
         }
 
         Workspace::operator json() const
@@ -69,7 +69,7 @@ namespace YY
             return data;
         }
 
-        void Workspace::resolveProject(ImportDependency *dependency)
+        void Workspace::resolveProject(ImportQuery *dependency)
         {
             // Necesito ir al yyconfig global y ver si está
             // Todavía no

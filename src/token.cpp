@@ -32,6 +32,7 @@ namespace YY
             {"=", Kind::O_ASSIGN},
             {"+", Kind::O_PLUS},
             {"+=", Kind::O_PLUS_EQ},
+            {".", Kind::O_ACCESS},
         };
 
         const std::map<std::string, Kind> keywordTokens = {
@@ -58,7 +59,7 @@ namespace YY
             {']', Kind::T_CLOSE_SQUARE},
             {';', Kind::T_SEMICOLON},
             {':', Kind::T_COLON},
-            {',', Kind::T_COMMA},
+            {',', Kind::T_COMMA}
         };
 
         std::string kindName(Kind kind)

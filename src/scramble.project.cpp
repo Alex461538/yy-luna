@@ -4,12 +4,12 @@ namespace YY
 {
     namespace Scramble
     {
-        void Project::panic(std::shared_ptr<Problem::Problem> problem)
+        void Tree::panic(std::shared_ptr<Problem::Problem> problem)
         {
             problems.push_back(problem);
         }
 
-        void Project::loadFromPath(const std::filesystem::path &path)
+        void Tree::loadFromPath(const std::filesystem::path &path)
         {
             root_path = path;
 
@@ -136,7 +136,7 @@ namespace YY
             }
         }
 
-        Package *Project::searchPackage(ImportDependency *dependency)
+        Package *Tree::searchPackage(ImportQuery *dependency)
         {
             // TODO OPTIONAL: Support semver ranges
 
@@ -182,7 +182,7 @@ namespace YY
             return candidate_package;
         }
 
-        void Project::resolveFromFile(ImportDependency *dependency, File *from = nullptr)
+        void Tree::resolveFromFile(ImportQuery *dependency, File *from = nullptr)
         {
             if (dependency == nullptr || from == nullptr)
             {
@@ -210,7 +210,7 @@ namespace YY
             }
         }
 
-        std::shared_ptr<File> Project::addFile(std::string abs_path)
+        std::shared_ptr<File> Tree::addFile(std::string abs_path)
         {
             // Thanks
             auto prev = files.find(std::string(abs_path));
@@ -233,7 +233,7 @@ namespace YY
             return std::format("{} <{}>", name, version.empty() ? "?" : version);
         }
 
-        Project::operator json() const
+        Tree::operator json() const
         {
             json data = json::object();
 

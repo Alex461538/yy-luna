@@ -17,6 +17,14 @@ yy-luna -s samples/test
 
 ./build/yy-luna -s samples/test -e obj -os linux -arch x64 -vendor pc
 
+Basic triplets are wtf
+
+These could serve as comp options or global macros:
+
+EXE format (elf,exe,dll...) <- pack in
+ISA: (x86,x86-64,arm[1..8]?,6502...) <- assemble for
+OS: (...) <- Use syscalls or-and api of
+
 */
 
 namespace YY {
