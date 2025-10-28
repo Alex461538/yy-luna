@@ -49,7 +49,7 @@ namespace YY
                     tokens[std::get<1>(pair)].enclosing = tokens.size() - 1;
                     if (std::get<0>(pair) != '(')
                     {
-                        panic(Problem::FileProblem::get(Problem::Type::ERR_STRAY_PAREN, ") expected", path.c_str(), {token.location.line, token.location.column}));
+                        panic(Problem::FileProblem::get(Problem::Type::ERR_STRAY_PAREN, ") expected", meta.path.c_str(), {token.location.line, token.location.column}));
                     }
                     brackets.pop_back();
                 }
@@ -60,7 +60,7 @@ namespace YY
                     tokens[std::get<1>(pair)].enclosing = tokens.size() - 1;
                     if (std::get<0>(pair) != '{')
                     {
-                        panic(Problem::FileProblem::get(Problem::Type::ERR_STRAY_PAREN, "} expected", path.c_str(), {token.location.line, token.location.column}));
+                        panic(Problem::FileProblem::get(Problem::Type::ERR_STRAY_PAREN, "} expected", meta.path.c_str(), {token.location.line, token.location.column}));
                     }
                     brackets.pop_back();
                 }
@@ -71,14 +71,14 @@ namespace YY
                     tokens[std::get<1>(pair)].enclosing = tokens.size() - 1;
                     if (std::get<0>(pair) != '[')
                     {
-                        panic(Problem::FileProblem::get(Problem::Type::ERR_STRAY_PAREN, "] expected", path.c_str(), {token.location.line, token.location.column}));
+                        panic(Problem::FileProblem::get(Problem::Type::ERR_STRAY_PAREN, "] expected", meta.path.c_str(), {token.location.line, token.location.column}));
                     }
                     brackets.pop_back();
                 }
                 break;
                 case Token::Kind::T_INVALID:
                 {
-                    panic(Problem::FileProblem::get(Problem::Type::ERR_INVALID_TOKEN, "Invalid token at lexing: " + std::string(token.text, token.length), path.c_str(), {token.location.line, token.location.column}));
+                    panic(Problem::FileProblem::get(Problem::Type::ERR_INVALID_TOKEN, "Invalid token at lexing: " + std::string(token.text, token.length), meta.path.c_str(), {token.location.line, token.location.column}));
                 }
                 break;
                 default:
@@ -91,10 +91,10 @@ namespace YY
             tokens.push_back(token);
         }
 
-        void File::loadFromPath(const std::filesystem::path &path)
+        void File::fromPath(const std::filesystem::path &path)
         {
-            this->path = path;
-            relative_path = std::filesystem::relative(path, owner_project->root_path);
+            this->meta.path = path;
+            meta.relative_path = std::filesystem::relative(path, owner_project->meta.root_path);
 
             std::stringstream buffer = std::stringstream();
             std::ifstream file(path, std::ios::binary);
@@ -121,8 +121,8 @@ namespace YY
         {
             json data = json::object();
 
-            data["path"] = path.c_str();
-            data["relative_path"] = relative_path.c_str();
+            data["path"] = meta.path.c_str();
+            data["relative_path"] = meta.relative_path.c_str();
 
             data["problems"] = json::array();
             data["deps"] = json::array();
@@ -168,11 +168,11 @@ namespace YY
             std::string abs_path;
             if (type == ImportType::IPT_FILE)
             {
-                abs_path = ((File*)target.get())->path;
+                abs_path = ((File*)target.get())->meta.path;
             }
             else if (type == ImportType::IPT_PROJ)
             {
-                abs_path = ((Project*)target.get())->root_path;
+                abs_path = ((Project*)target.get())->meta.root_path;
             }
             return std::format("{} <{}> {} {}", path, version.empty() ? "?" : version, std::to_string((int)type), abs_path);
         }
@@ -229,7 +229,7 @@ namespace YY
                         if (symbolName->kind != Token::Kind::T_IDENTIFIER)
                         {
                             index--; // Prevent phantom consumption
-                            panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<identifier> expected", path.c_str(), {token->location.line, token->location.column}));
+                            panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<identifier> expected", meta.path.c_str(), {token->location.line, token->location.column}));
                             break;
                         }
 
@@ -254,7 +254,7 @@ namespace YY
                             if (aliasName->kind != Token::Kind::T_IDENTIFIER)
                             {
                                 index--; // Prevent phantom consumption
-                                panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<identifier> expected", path.c_str(), {token->location.line, token->location.column}));
+                                panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<identifier> expected", meta.path.c_str(), {token->location.line, token->location.column}));
                                 break;
                             }
 
@@ -317,7 +317,7 @@ namespace YY
                             else
                             {
                                 index--; // Prevent phantom consumption
-                                panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<string lit> expected", path.c_str(), {token->location.line, token->location.column}));
+                                panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, "<string lit> expected", meta.path.c_str(), {token->location.line, token->location.column}));
                                 continue;
                             }
 
@@ -326,7 +326,7 @@ namespace YY
                         else
                         {
                             index--; // Prevent phantom consumption
-                            panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, ", | <from> expected", path.c_str(), {token->location.line, token->location.column}));
+                            panic(Problem::FileProblem::get(Problem::Type::ERR_EXPECTED, ", | <from> expected", meta.path.c_str(), {token->location.line, token->location.column}));
                             break;
                         }
                     }

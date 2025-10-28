@@ -9,11 +9,9 @@ namespace YY
             problems.push_back(problem);
         }
 
-        void Project::loadFromPath(const std::filesystem::path &path)
+        void Project::fromPath(const std::filesystem::path &path)
         {
-            root_path = path;
-
-            //std::printf("Loading workspace from path: %s\n", path.c_str());
+            meta.root_path = path;
 
             json yyconf = {};
             std::ifstream file((std::filesystem::path(path) / "yyconf.json").c_str());
@@ -40,17 +38,17 @@ namespace YY
             {
                 if (yyconf.contains("name") && yyconf["name"].is_string())
                 {
-                    name = yyconf["name"].get<std::string>();
+                    meta.name = yyconf["name"].get<std::string>();
                 }
                 else
                 {
-                    name = path.filename().string();
+                    meta.name = path.filename().string();
                     panic(Problem::WPProblem::get(Problem::Type::ERR_PROJECT_INVALID_CONFIG, "Project name is missing or not a string", path.c_str()));
                 }
 
                 if (yyconf.contains("main") && yyconf["main"].is_string())
                 {
-                    main_path = yyconf["main"].get<std::string>();
+                    meta.main_path = yyconf["main"].get<std::string>();
 
                     std::filesystem::path main_path = path / yyconf["main"].get<std::string>();
                     if (!std::filesystem::exists(main_path))
@@ -66,21 +64,21 @@ namespace YY
 
                 if (yyconf.contains("author") && yyconf["author"].is_string())
                 {
-                    author = yyconf["author"].get<std::string>();
+                    meta.author = yyconf["author"].get<std::string>();
                 }
 
                 if (yyconf.contains("description") && yyconf["description"].is_string())
                 {
-                    description = yyconf["description"].get<std::string>();
+                    meta.description = yyconf["description"].get<std::string>();
                 }
 
                 if (yyconf.contains("version") && yyconf["version"].is_string())
                 {
-                    version = yyconf["version"].get<std::string>();
+                    meta.version = yyconf["version"].get<std::string>();
                 }
                 else
                 {
-                    version = "0.0.1";
+                    meta.version = "0.0.1";
                     panic(Problem::WPProblem::get(Problem::Type::ERR_PROJECT_INVALID_CONFIG, "Version is missing or not a string", path.c_str()));
                 }
 
@@ -90,7 +88,7 @@ namespace YY
                     {
                         if (keyword.is_string())
                         {
-                            keywords.push_back(keyword.get<std::string>());
+                            meta.keywords.push_back(keyword.get<std::string>());
                         }
                     }
                 }
@@ -113,21 +111,21 @@ namespace YY
                                 pkg.version = package["version"];
                             }
 
-                            packages.push_back(pkg);
+                            meta.packages.push_back(pkg);
                         }
                     }
                 }
 
-                if (!main_path.empty())
+                if (!meta.main_path.empty())
                 {
-                    auto abs_path = std::filesystem::path(main_path);
+                    auto abs_path = std::filesystem::path(meta.main_path);
 
                     if (!abs_path.is_absolute())
                     {
-                        abs_path = root_path / main_path;
+                        abs_path = meta.root_path / meta.main_path;
                     }
 
-                    addFile(abs_path.c_str());
+                    main = addFile(abs_path.c_str());
                 }
             }
             else
@@ -156,7 +154,7 @@ namespace YY
 
             Package *candidate_package = nullptr;
 
-            for (auto &pkg : packages)
+            for (auto &pkg : meta.packages)
             {
                 if (pkg.name == dependency->path)
                 {
@@ -203,7 +201,7 @@ namespace YY
             else
             {
                 // TODO check if a path is only inside the project
-                auto abs_path = from->path.parent_path() / std::filesystem::path(dependency->path);
+                auto abs_path = from->meta.path.parent_path() / std::filesystem::path(dependency->path);
 
                 dependency->attachFile(
                     addFile(abs_path.c_str()));
@@ -213,8 +211,8 @@ namespace YY
         std::shared_ptr<File> Project::addFile(std::string abs_path)
         {
             // Thanks
-            auto prev = files.find(std::string(abs_path));
-            if (prev != files.end())
+            auto prev = registry.find(std::string(abs_path));
+            if (prev != registry.end())
             {
                 return prev->second;
             }
@@ -222,8 +220,8 @@ namespace YY
             {
                 auto file = std::make_shared<File>();
                 file.get()->owner_project = this;
-                files[abs_path] = file;
-                file.get()->loadFromPath(abs_path);
+                registry[abs_path] = file;
+                file.get()->fromPath(abs_path);
                 return file;
             }
         }
@@ -237,12 +235,12 @@ namespace YY
         {
             json data = json::object();
 
-            data["name"] = name.c_str();
-            data["version"] = version.c_str();
-            data["description"] = description.c_str();
-            data["author"] = author.c_str();
-            data["main"] = main_path.c_str();
-            data["root"] = root_path.c_str();
+            data["name"] = meta.name.c_str();
+            data["version"] = meta.version.c_str();
+            data["description"] = meta.description.c_str();
+            data["author"] = meta.author.c_str();
+            data["main"] = meta.main_path.c_str();
+            data["root"] = meta.root_path.c_str();
 
             data["problems"] = json::array();
             data["keywords"] = json::array();
@@ -254,12 +252,12 @@ namespace YY
             auto &afiles = data.at("files");
             auto &apacks = data.at("packages");
 
-            for (auto &p : packages)
+            for (auto &p : meta.packages)
             {
                 apacks.push_back(std::string(p));
             }
 
-            for (auto &k : keywords)
+            for (auto &k : meta.keywords)
             {
                 akeys.push_back(k);
             }
@@ -269,7 +267,7 @@ namespace YY
                 aprobs.push_back(std::string(*p));
             }
 
-            for (const auto &[key, value] : files)
+            for (const auto &[key, value] : registry)
             {
                 afiles.push_back( json(*value.get()) );
             }

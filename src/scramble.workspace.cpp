@@ -9,14 +9,15 @@ namespace YY
             problems.push_back(problem);
         }
 
-        void Workspace::loadFromPath(const std::filesystem::path &path)
+        void Workspace::fromPath(const std::filesystem::path &path)
         {
-            root_path = path;
-            addProject(path);
+            root = addProject(path);
         }
 
         std::shared_ptr<Project> Workspace::addProject(const std::filesystem::path &path)
         {
+            auto project = std::make_shared<Project>();
+
             if (!path.is_absolute())
             {
                 panic(Problem::WPProblem::get(Problem::Type::ERR_RESOURCE_UNREACHABLE, "A project can't be resolved from a relative path", path.c_str()));
@@ -27,29 +28,27 @@ namespace YY
             }
             else
             {
-                auto prev = projects.find(std::string(path));
-                if (prev != projects.end())
+                auto prev = registry.find(std::string(path));
+                if (prev != registry.end())
                 {
                     return prev->second;
                 }
                 else
                 {
-                    auto project = std::make_shared<Project>();
                     project.get()->owner_workspace = this;
-                    projects[path] = project;
-                    project.get()->loadFromPath(path);
+                    registry[path] = project;
+                    project.get()->fromPath(path);
                     return project;
                 }
             }
 
-            return std::make_shared<Project>();
+            return project;
         }
 
         Workspace::operator json() const
         {
             json data = json::object();
 
-            data["root"] = root_path.c_str();
             data["problems"] = json::array();
             data["projects"] = json::array();
 
@@ -61,7 +60,7 @@ namespace YY
                 aprobs.push_back(std::string(*p));
             }
 
-            for (const auto &[key, value] : projects)
+            for (const auto &[key, value] : registry)
             {
                 aprojs.push_back( json(*value.get()) );
             }
