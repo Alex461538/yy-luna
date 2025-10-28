@@ -198,7 +198,14 @@ namespace YY
                 // TODO check if a path is only inside the project
                 auto abs_path = from->meta.path.parent_path() / std::filesystem::path(dependency.name);
 
-                dependency.attachFile( addFile(abs_path.c_str()).get()->meta.path );
+                if (std::filesystem::exists(abs_path))
+                {
+                    dependency.attachFile( addFile(abs_path.c_str()).get()->meta.path );
+                }
+                else
+                {
+                    panic( YY::Problem::WPProblem::get(Problem::Type::ERR_FILE_NOT_FOUND, "No such package found in yyconf.json nor a file at a relative directory", from->meta.path) );
+                }
             }
         }
 

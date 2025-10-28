@@ -1,7 +1,7 @@
 {
-    "name": "std",
+    "name": "Std",
     "version": "1.0.0",
-    "description": "YY std library",
+    "description": "YY cross-platform std library",
     "keywords": [],
     "author": "Alex",
     "main": "main.yy",

@@ -1,6 +1,7 @@
 #include <filesystem>
 
 #include "info.hpp"
+#include "problem.hpp"
 
 namespace YY 
 {
@@ -11,5 +12,6 @@ namespace YY
     }
 }
 
+#include "config.hpp"
 #include "scramble.hpp"
 #include "cli.hpp"

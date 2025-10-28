@@ -1,23 +1,11 @@
 {
-    "name": "test",
+    "name": "Hello world",
     "version": "1.0.0",
-    "description": "Una cosita bella",
-    "keywords": [
-        "Testeo",
-        "examen",
-        "reucolsan"
-    ],
-    "author": "Yo",
+    "description": "El hola mundo definitivo",
+    "keywords": ["Unless i create a package manager, nobody cares about keywords"],
+    "author": "Alex",
     "main": "main.yy",
     "packages": [
-        {
-            "name": "truetype",
-            "version": "1.0.0"
-        },
-        {
-            "name": "truetype",
-            "version": "0.1.0"
-        },
         {
             "name": "std",
             "version": "1.0.0"

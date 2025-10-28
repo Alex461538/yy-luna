@@ -3,6 +3,15 @@
 
 #include <string>
 #include <format>
+#include <fstream>
+
+#include <json.hpp>
+#include <semver.hpp>
+
+#include "problem.hpp"
+#include "info.hpp"
+
+using json = nlohmann::json;
 
 namespace YY
 {
@@ -27,7 +36,7 @@ namespace YY
             ImportQuery(std::string &_query);
         };
 
-        std::string resolveGlobalPackage(PackageEntry query);
+        std::string resolveGlobalPackage(ImportQuery &query);
     }
 }
 

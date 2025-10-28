@@ -1,6 +1,6 @@
 namespace Filesystem
 {
-    class File {        
+    class File {
         function open(copy path: String)
         {
             /* 
