@@ -99,7 +99,7 @@ namespace YY
                     {
                         if (package.is_object())
                         {
-                            Package pkg;
+                            Config::PackageEntry pkg;
 
                             if (package.contains("name") and package["name"].is_string())
                             {
@@ -108,7 +108,7 @@ namespace YY
 
                             if (package.contains("version") and package["version"].is_string())
                             {
-                                pkg.version = package["version"];
+                                pkg.version_matcher = package["version"];
                             }
 
                             meta.packages.push_back(pkg);
@@ -134,17 +134,12 @@ namespace YY
             }
         }
 
-        Package *Project::searchPackage(ImportDependency *dependency)
+        Config::PackageEntry *Project::searchPackage(Config::ImportQuery &dependency)
         {
             // TODO OPTIONAL: Support semver ranges
 
-            if (dependency == nullptr)
-            {
-                return nullptr;
-            }
-
             semver::version version;
-            bool valid_version = semver::parse(dependency->version, version);
+            bool valid_version = semver::parse(dependency.version, version);
 
             semver::version candidate_version;
             bool valid_can_ver = false;
@@ -152,23 +147,23 @@ namespace YY
             semver::version temp_ver;
             bool valid_temp_ver = false;
 
-            Package *candidate_package = nullptr;
+            Config::PackageEntry *candidate_package = nullptr;
 
             for (auto &pkg : meta.packages)
             {
-                if (pkg.name == dependency->path)
+                if (pkg.name == dependency.name)
                 {
                     if (!valid_version)
                     {
-                        valid_temp_ver = semver::parse(pkg.version, temp_ver);
+                        valid_temp_ver = semver::parse(pkg.version_matcher, temp_ver);
                         // Grab the newest
                         if (candidate_package == nullptr || (candidate_package && valid_can_ver && valid_temp_ver && candidate_version < temp_ver))
                         {
                             candidate_package = &pkg;
-                            valid_can_ver = semver::parse(candidate_package->version, candidate_version);
+                            valid_can_ver = semver::parse(candidate_package->version_matcher, candidate_version);
                         }
                     }
-                    else if (pkg.version == dependency->version)
+                    else if (pkg.version_matcher == dependency.version)
                     {
                         // Grab this only
                         candidate_package = &pkg;
@@ -180,18 +175,18 @@ namespace YY
             return candidate_package;
         }
 
-        void Project::resolveFromFile(ImportDependency *dependency, File *from = nullptr)
+        void Project::resolveFromFile(Config::ImportQuery &dependency, File *from = nullptr)
         {
-            if (dependency == nullptr || from == nullptr)
+            if (from == nullptr)
             {
                 return;
             }
 
-            Package *candidate_package = searchPackage(dependency);
+            Config::PackageEntry *candidate_package = searchPackage(dependency);
 
             if (candidate_package)
             {
-                dependency->version = candidate_package->version;
+                dependency.version = candidate_package->version_matcher;
 
                 if (owner_workspace)
                 {
@@ -201,10 +196,9 @@ namespace YY
             else
             {
                 // TODO check if a path is only inside the project
-                auto abs_path = from->meta.path.parent_path() / std::filesystem::path(dependency->path);
+                auto abs_path = from->meta.path.parent_path() / std::filesystem::path(dependency.name);
 
-                dependency->attachFile(
-                    addFile(abs_path.c_str()));
+                dependency.attachFile( addFile(abs_path.c_str()).get()->meta.path );
             }
         }
 
@@ -224,11 +218,6 @@ namespace YY
                 file.get()->fromPath(abs_path);
                 return file;
             }
-        }
-
-        Package::operator std::string() const
-        {
-            return std::format("{} <{}>", name, version.empty() ? "?" : version);
         }
 
         Project::operator json() const

@@ -13,6 +13,8 @@
 #include <format>
 #include <set>
 
+#include "config.hpp"
+
 #include "lexer.hpp"
 #include "problem.hpp"
 #include "info.hpp"
@@ -27,7 +29,6 @@ namespace YY
     namespace Scramble
     {
         struct Workspace;
-        struct Package;
         struct Project;
         struct File;
         struct ImportDependency;
@@ -40,20 +41,13 @@ namespace YY
             std::vector<std::shared_ptr<Problem::Problem>> problems;
 
             void fromPath(const std::filesystem::path &path);
-            void resolveProject(ImportDependency *dependency);
+            void resolveProject(Config::ImportQuery &dependency);
             
             std::shared_ptr<Project> addProject(const std::filesystem::path &path);
             
             void panic(std::shared_ptr<Problem::Problem> problem);
 
             operator json() const;
-        };
-
-        struct Package {
-            std::string name;
-            std::string version;
-
-            operator std::string() const;
         };
 
         struct Project
@@ -68,7 +62,7 @@ namespace YY
                 std::filesystem::path root_path;
 
                 std::vector<std::string> keywords;
-                std::vector<Package>packages;
+                std::vector<Config::PackageEntry>packages;
             } meta;
 
             Workspace *owner_workspace;
@@ -80,9 +74,10 @@ namespace YY
 
             void panic(std::shared_ptr<Problem::Problem> problem);
             void fromPath(const std::filesystem::path &path);
-            void resolveFromFile(ImportDependency *dependency, File *from);
+
+            void resolveFromFile(Config::ImportQuery &dependency, File *from);
             
-            Package *searchPackage(ImportDependency *dependency);
+            Config::PackageEntry *searchPackage(Config::ImportQuery &dependency);
             
             std::shared_ptr<File> addFile(std::string abs_path);
 
@@ -91,6 +86,12 @@ namespace YY
 
         struct File
         {
+            enum class ImportType {
+                IPT_NONE,
+                IPT_FILE,
+                IPT_PROJ
+            };
+
             struct Meta {
                 std::filesystem::path path;
                 std::filesystem::path relative_path;
@@ -98,7 +99,8 @@ namespace YY
 
             Project *owner_project;
 
-            std::vector<ImportDependency> dependencies;
+            /* firstly, an unknown type and the import query, then, after flattened the actual type and absoulte path */
+            std::vector<std::pair<ImportType, std::string>> dependencies;
             std::map<std::string, std::pair<std::string, size_t>> importNamespaces;
 
             std::string content;
@@ -118,30 +120,6 @@ namespace YY
             size_t addDependency(std::string query);
 
             operator json() const;
-        };
-
-        struct ImportDependency
-        {
-            enum class ImportType {
-                IPT_NONE,
-                IPT_FILE,
-                IPT_PROJ,
-                IPT_LINK // Imagine importing binary libs!
-            };
-
-            std::string version;
-            std::string path;
-
-            ImportType type;
-            std::shared_ptr<void> target;
-
-            ImportDependency();
-            ImportDependency(std::string _path);
-
-            void attachFile(std::shared_ptr<File> target);
-            void attachProject(std::shared_ptr<Project> target);
-
-            operator std::string() const;
         };
 
         Workspace fromPath(const std::filesystem::path &path);

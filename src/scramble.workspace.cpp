@@ -68,18 +68,13 @@ namespace YY
             return data;
         }
 
-        void Workspace::resolveProject(ImportDependency *dependency)
+        void Workspace::resolveProject(Config::ImportQuery &dependency)
         {
             // Necesito ir al yyconfig global y ver si está
             // Todavía no
 
-            if (dependency == nullptr)
-            {
-                return;
-            }
-
             semver::version dep_version;
-            bool valid_dep_version = semver::parse(dependency->version, dep_version);
+            bool valid_dep_version = semver::parse(dependency.version, dep_version);
 
             json yyconf = {};
             std::ifstream file((std::filesystem::path(YY::HOME_PATH) / "yyconf.json").c_str());
@@ -125,12 +120,10 @@ namespace YY
                         semver::version pkg_version;
                         bool valid_pkg_version = semver::parse(version, pkg_version);
 
-                        if (pkg_version == dep_version && name == dependency->path)
+                        if (pkg_version == dep_version && name == dependency.name)
                         {
-                            auto abs_path = HOME_PATH / std::filesystem::path(path);
-                            dependency->attachProject(
-                                addProject(abs_path)
-                            );
+                            auto abs_path = std::filesystem::absolute( HOME_PATH / std::filesystem::path(path) );
+                            dependency.attachProject( addProject(abs_path).get()->meta.root_path );
                             break;
                         }
                     }

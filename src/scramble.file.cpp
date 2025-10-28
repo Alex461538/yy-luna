@@ -139,7 +139,7 @@ namespace YY
 
             for (auto &d : dependencies)
             {
-                adeps.push_back(std::string(d));
+                adeps.push_back(std::to_string((int)d.first) + " " + d.second);
             }
 
             /* for (auto &t : tokens)
@@ -150,39 +150,19 @@ namespace YY
             return data;
         }
 
-        ImportDependency::ImportDependency(){}
+        /* ImportDependency::ImportDependency(){}
 
         ImportDependency::ImportDependency(std::string _path)
         {
-            std::string::size_type version_sepr = _path.find(':');
-            path = _path.substr(0, version_sepr);
-            if (version_sepr != std::string::npos)
-            {
-                version = _path.substr(version_sepr + 1);
-            }
-        }
-
-        ImportDependency::operator std::string() const
-        {
-            // This WILL cause a lot of problems
-            std::string abs_path;
-            if (type == ImportType::IPT_FILE)
-            {
-                abs_path = ((File*)target.get())->meta.path;
-            }
-            else if (type == ImportType::IPT_PROJ)
-            {
-                abs_path = ((Project*)target.get())->meta.root_path;
-            }
-            return std::format("{} <{}> {} {}", path, version.empty() ? "?" : version, std::to_string((int)type), abs_path);
-        }
+            
+        } */
 
         size_t File::addDependency(std::string query)
         {
             // Shoul i care too much of duplicate deps here?
             // Oh, FIX DUP NAMESPACES FOR NOW
             // PaThS LaTeR
-            dependencies.push_back(ImportDependency(query));
+            dependencies.push_back( {ImportType::IPT_NONE, query} );
             return dependencies.size() - 1;
         }
 
@@ -334,28 +314,19 @@ namespace YY
             }
         }
 
-        void ImportDependency::attachFile(std::shared_ptr<File> target) 
-        {
-            //
-            type = ImportType::IPT_FILE;
-            this->target = target;
-        }
-
-        void ImportDependency::attachProject(std::shared_ptr<Project> target) 
-        {
-            //
-            type = ImportType::IPT_PROJ;
-            this->target = target;
-        }
-
         void File::resolve(size_t dependency_index)
         {
-            auto &dependency = dependencies[dependency_index];
+            auto &reg = dependencies[dependency_index]; 
+            auto &dependency = reg.second;
+
+            Config::ImportQuery query(dependency);
 
             if (owner_project != nullptr)
             {
-                owner_project->resolveFromFile(&dependency, this);
+                owner_project->resolveFromFile(query, this);
             }
+
+            reg.second = query.path;
         }
 
         void File::flatten()
