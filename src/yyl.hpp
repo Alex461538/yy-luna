@@ -11,13 +11,5 @@ namespace YY
     }
 }
 
-/*
-Couples to nothing
-*/
 #include "scramble.hpp"
-/*
-Couples to Scramble
-*/
-#include "interp.hpp"
-
 #include "cli.hpp"

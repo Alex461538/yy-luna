@@ -15,8 +15,6 @@ add_executable(yy-luna
     src/scramble.project.cpp
     src/scramble.file.cpp
 
-    src/interp.cpp
-
     src/problem.cpp
     src/info.cpp
     src/cli.cpp

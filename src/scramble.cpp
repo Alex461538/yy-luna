@@ -4,14 +4,11 @@ namespace YY
 {
     namespace Scramble
     {
-        namespace Transformers
+        Workspace pathToWorkspace(const std::filesystem::path &path)
         {
-            Workspace fromPath(const std::filesystem::path &path)
-            {
-                Workspace workspace;
-                workspace.loadFromPath(path);
-                return workspace;
-            }
+            Workspace workspace;
+            workspace.loadFromPath(path);
+            return workspace;
         }
     }
 }

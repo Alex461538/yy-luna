@@ -1,11 +1,23 @@
 {
-    "name": "Hello world",
+    "name": "test",
     "version": "1.0.0",
-    "description": "Hello world in YY",
-    "keywords": [],
-    "author": "Alex",
+    "description": "Una cosita bella",
+    "keywords": [
+        "Testeo",
+        "examen",
+        "reucolsan"
+    ],
+    "author": "Yo",
     "main": "main.yy",
     "packages": [
+        {
+            "name": "truetype",
+            "version": "1.0.0"
+        },
+        {
+            "name": "truetype",
+            "version": "0.1.0"
+        },
         {
             "name": "std",
             "version": "1.0.0"

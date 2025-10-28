@@ -16,7 +16,6 @@
 #include "lexer.hpp"
 #include "problem.hpp"
 #include "info.hpp"
-#include "yyconf.hpp"
 
 #include <json.hpp>
 #include <semver.hpp>
@@ -27,30 +26,38 @@ namespace YY
 {
     namespace Scramble
     {
-        struct Tree;
+        struct Workspace;
+        struct Package;
+        struct Project;
         struct File;
-
-        struct ImportQuery;
+        struct ImportDependency;
 
         struct Workspace
         {
             std::filesystem::path root_path;
 
-            std::map<std::string, std::shared_ptr<Tree>> projects;
+            std::map<std::string, std::shared_ptr<Project>> projects;
 
             std::vector<std::shared_ptr<Problem::Problem>> problems;
 
             void panic(std::shared_ptr<Problem::Problem> problem);
             void loadFromPath(const std::filesystem::path &path);
 
-            std::shared_ptr<Tree> addProject(const std::filesystem::path &path);
+            std::shared_ptr<Project> addProject(const std::filesystem::path &path);
 
-            void resolveProject(ImportQuery *dependency);
+            void resolveProject(ImportDependency *dependency);
 
             operator json() const;
         };
 
-        struct Tree
+        struct Package {
+            std::string name;
+            std::string version;
+
+            operator std::string() const;
+        };
+
+        struct Project
         {
             Workspace *owner_workspace;
 
@@ -65,7 +72,7 @@ namespace YY
             std::shared_ptr<File> main;
 
             std::vector<std::string> keywords;
-            std::vector<YYConf::Package>packages;
+            std::vector<Package>packages;
 
             std::map<std::string, std::shared_ptr<File>> files;
             std::vector<std::shared_ptr<Problem::Problem>> problems;
@@ -75,16 +82,16 @@ namespace YY
 
             operator json() const;
 
-            void resolveFromFile(ImportQuery *dependency, File *from);
+            void resolveFromFile(ImportDependency *dependency, File *from);
 
             std::shared_ptr<File> addFile(std::string abs_path);
 
-            YYConf::Package *searchPackage(ImportQuery *dependency);
+            Package *searchPackage(ImportDependency *dependency);
         };
 
         struct File
         {
-            Tree *owner_project;
+            Project *owner_project;
 
             std::filesystem::path path;
             std::filesystem::path relative_path;
@@ -95,7 +102,7 @@ namespace YY
 
             std::vector<Token::Token> tokens;
 
-            std::vector<ImportQuery> dependencies;
+            std::vector<ImportDependency> dependencies;
             std::map<std::string, std::pair<std::string, size_t>> importNamespaces;
 
             size_t addDependency(std::string query);
@@ -109,12 +116,25 @@ namespace YY
 
             void preprocess();
 
+            /*
+            Dependencias: Enlaces hacia otros archivos o proyectos
+
+            diccionario de namespaces -> índices de importe
+            array de importes -> Información de dependencia local
+            */
+
+            /*
+            Applies all preprocessing queued operations to the file's token stream.
+            This includes:
+                - Import resolution
+                - Branching (conditional compilation)
+            */
             void flatten();
 
             operator json() const;
         };
 
-        struct ImportQuery
+        struct ImportDependency
         {
             enum class ImportType {
                 IPT_NONE,
@@ -129,20 +149,54 @@ namespace YY
             ImportType type;
             std::shared_ptr<void> target;
 
-            ImportQuery();
-            ImportQuery(std::string _path);
+            ImportDependency();
+            ImportDependency(std::string _path);
 
             void attachFile(std::shared_ptr<File> target);
-            void attachProject(std::shared_ptr<Tree> target);
+            void attachProject(std::shared_ptr<Project> target);
 
             operator std::string() const;
         };
 
-        namespace Transformers
-        {
-            Workspace fromPath(const std::filesystem::path &path);
-        }
+        Workspace pathToWorkspace(const std::filesystem::path &path);
     }
 }
+
+/*
+
+Inside a workspace there are different projects and one is marked as root.
+
+Inside a project there are files and one marked as root.
+
+A file can depend of other files.
+A file can also depend on a project, this implies either having a project reference or could simply be the project's root file reference.
+
+A porject has a reference to it's workspace.
+A file has a reference to it's project
+
+If a file imports another thing, it tells the project to resolve it:
+    If the name is a path (.../file.yy) and:
+        it's inside the project folder, it tries to resolve the name relative to the requester.
+        it's outside the project folder, raises an error, we don't want to get hacked somehow.
+    If the name seems to be a package name:
+        The project searches the name in its yyconf packages entry and tells the workspace to resolve it.
+        For the workspace:
+            If it's in their loaded projects, it recycles the reference.
+            If it's not, it tells yy-luna to resolve it from the installed packages and loads it.
+
+Resolvers for those operations could be found in the classes, or be in a resolver file
+
+One thing i thought about, for avoiding conflicts and making everything easier,
+is isolating dependencies, for instance, if A->B & B->C then A-/->C,
+unless A explicitly imports it.
+Each file should export namespaces (variables in their global namespace are private),
+and each requester, imports the desired namespaces.
+
+import Std from "std";
+import Truetype from "truetype";
+import Truetype as Truetype_legacy from "truetype:0.1.0";
+import Sub from "sub/sub.yy";
+
+*/
 
 #endif
