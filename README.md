@@ -47,6 +47,47 @@ import "ines.yy"
 }
 ```
 
+## Roadmap
+
+### ☔️ Completed
+
+- [x] Basic CLI frontend (build and rpc-connect commands)
+- [x] Workspace/Package/File loader classes
+- [x] Lexer implementation
+- [x] Basic preprocessor (imports)
+- [x] RPC-LSP stdio connection
+
+### 🔑 In Progress
+
+- [ ] RPC/LSP integration and refactoring
+- [ ] Import system refinement
+
+### ⁉️ Planned
+
+#### Frontend
+
+- [ ] Complete LSP server implementation
+- [ ] Enhanced preprocessor features
+
+#### Middle-end
+
+- [ ] AST construction
+- [ ] Semantic analysis
+- [ ] Type checking
+- [ ] Symbol resolution
+
+#### Backend
+
+- [ ] Documentation generator (LaTeX/PDF)
+- [ ] Code generation
+- [ ] LLVM IR backend
+- [ ] Custom backend for embedded targets (NES, etc.)
+
+#### Tooling & Libraries
+
+- [ ] Standard library
+- [ ] Example projects
+
 ## Installing
 
 I want to keep this thing as simple and dependency-free as I can, such that linking it after forgetting about it for a while is not a nightmare.
@@ -112,8 +153,7 @@ This project has some value for me, but also I want to be flexible, so I picked 
 
 ## ⚕️ Art
 
-what | is this
-:---:|:---:
 ![A nice pet, lunar goat](images/pet.svg) | ![flower](images/flower.jpeg)
+:---:|:---:
 ![A nice pet, lunar goat](images/backrooms.jpeg) | ![flower](images/logisim.jpeg)
-![A nice pet, lunar goat](images/box.jpeg) | ![flower](images/pearly.jpeg)
+![A nice pet, lunar goat](images/box.jpeg) | ![A nice pet, lunar goat](images/freddy.jpeg) 
