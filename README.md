@@ -64,13 +64,56 @@ cmake --build build
 
 With your specific environment or toolchain, you should grab any required libraries easily for linking. For windows I like vcpkg, and for linux I really like  raw apt, it works somehow.
 
-![A nice pet, lunar goat](images/pet.svg)
+## Environment setup
+
+This machine is designed to be portable, so it does not need any extra setup to run.
+
+But if you want to execute this easily or integrate it in your IDE, add the executable folder to the path, and point to it with `YY_LUNA_HOME`.
+
+## Running
+
+### Response checking
+
+If you just installed this thing and want to test it, run this command to see a nice banner!
+
+```bash
+yy-luna version
+```
+
+### Project building
+
+What should I say?
+
+```bash
+yy-luna build --source ./my-project --pkg exe --isa x86-64 --osapi windows
+```
+
+I have also the idea of adding docs:
+
+```bash
+yy-luna build --source ./my-project --pkg latex-pdf
+```
+
+### json RPC / LSP support
+
+Currently only `stdio` communication is supported, see the [LSP spec](https://microsoft.github.io/language-server-protocol/) and integrate YY in your IDE!
+
+```bash
+yy-luna rpc-connect --transport stdio
+```
 
 ## License
 
-This project is under the [Artistic License 2.0](https://opensource.org/license/artistic-2-0). I want to be flexible and also this machine has some value for me, in short words this license states:
+This project has some value for me, but also I want to be flexible, so I picked [Artistic License 2.0](https://opensource.org/license/artistic-2-0). In short words this license states:
 
 - Free modification and redistribution provided that:
 - Any modification is explicitly marked as such.
+- You reference the original project.
 
-It also requires that every modified package references the original in a detailed form, I don't care, just mark it as a mod and that's it 🥀.
+## ⚕️ Art
+
+what | is this
+:---:|:---:
+![A nice pet, lunar goat](images/pet.svg) | ![flower](images/flower.jpeg)
+![A nice pet, lunar goat](images/backrooms.jpeg) | ![flower](images/logisim.jpeg)
+![A nice pet, lunar goat](images/box.jpeg) | ![flower](images/pearly.jpeg)

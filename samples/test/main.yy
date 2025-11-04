@@ -7,11 +7,19 @@ import Sub from "sub/sub.yy";
 
 import i_wanna_die from "sub/sub.yy";
 
+tesorito's favorities
+
+giving bombs to carity
+
 namespace Test {
     namespace LZW {
         
     }
     /* var ANY_VAR: i64 = 6;
+
+    go compress your children
+
+    giving bombs to carity
 
     class Nothing;
 
@@ -24,6 +32,6 @@ namespace Test {
     
     function main(): i32
     {
-        return true false infinity nan;
+        return true false infinity;
     }
 }

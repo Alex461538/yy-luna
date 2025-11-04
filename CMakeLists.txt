@@ -9,19 +9,6 @@ cmake_policy(SET CMP0072 NEW)
 
 add_executable(yy-luna 
     src/main.cpp
-
-    src/scramble.cpp
-    src/scramble.workspace.cpp
-    src/scramble.project.cpp
-    src/scramble.file.cpp
-
-    src/config.cpp
-
-    src/problem.cpp
-    src/info.cpp
-    src/cli.cpp
-    src/token.cpp
-    src/lexer.cpp
 )
 
 target_include_directories(yy-luna 
@@ -34,3 +21,6 @@ target_include_directories(yy-luna
 # target_link_libraries(yy-luna glfw)
 # target_link_libraries(yy-luna openal) # libopenal-dev
 # target_link_libraries(yy-luna sndfile) # 
+
+# cmake -S . -B build
+# cmake --build build

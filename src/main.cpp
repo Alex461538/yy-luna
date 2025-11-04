@@ -1,24 +1,15 @@
-#include <iostream>
-#include <string>
+#include "yy/yy.hpp"
 
-#include "yyl.hpp"
-
-int main( int argc, const char **argv )
+int main(int argc, const char **argv)
 {
-    YY::init();
-
-    json args = YY::CLI::parseArgs(argc, argv);
-
-    std::filesystem::path source = args["source"];
-
-    if (source.empty() || !source.is_absolute())
-    {
-        return 1;
-    }
-
-    YY::Scramble::Workspace workspace = YY::Scramble::fromPath(source);
-
-    std::cout << ((json)workspace).dump(4) << std::endl;
-
+    YY::CLI::Command command;
+    // Init all required constants
+    YY::Constants::init();
+    // Clear logfile output
+    YY::Debug::clear();
+    // Parse command from cmdl
+    command.parse(argv, argc);
+    // Execute parsed command
+    command.execute();
     return 0;
 }
