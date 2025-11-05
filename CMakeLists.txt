@@ -9,6 +9,16 @@ cmake_policy(SET CMP0072 NEW)
 
 add_executable(yy-luna 
     src/main.cpp
+
+    src//yy/out.cpp
+    src/yy/constants.cpp
+
+    src/yy/lsp/lsp-message.cpp
+    src/yy/lsp/rpc.cpp
+    src/yy/lsp/server.cpp
+
+    src/yy/fs/text_document.cpp
+    src/yy/scramble/scramble.cpp
 )
 
 target_include_directories(yy-luna 

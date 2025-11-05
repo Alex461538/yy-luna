@@ -1,31 +1,9 @@
-#ifndef __hpp_yy_lsp_message__
-#define __hpp_yy_lsp_message__
-
-//  --- Global includes ---
-#include <optional>
-#include <string>
-//  --- Project includes ---
-#include <json.hpp>
-//  --- Local includes ---
-#include "../fs/text_document.hpp"
-
-using json = nlohmann::json;
+#include "lsp-message.hpp"
 
 namespace YY
 {
     namespace LSP
     {
-        struct URI
-        {
-            std::string text;
-        };
-
-        struct WorkspaceFolder
-        {
-            URI uri;
-            std::string name;
-        };
-
         void from_json(const json &j, URI &p)
         {
             if (j.is_string())
@@ -34,52 +12,59 @@ namespace YY
             }
         }
 
+        void to_json(json &j, const URI &p)
+        {
+            j = p.text;
+        }
+
         void from_json(const json &j, WorkspaceFolder &p)
         {
-            if (j.is_object())
+            if (
+                j.is_object() &&
+                j.contains("name") &&
+                j.contains("uri") &&
+                j["name"].is_string() &&
+                j["uri"].is_string())
             {
-                if (j.contains("name") && j["name"].is_string())
-                {
-                    p.name = j["name"].get<std::string>();
-                }
-                if (j.contains("uri") && j["uri"].is_string())
-                {
-                    p.uri = j["version"].get<URI>();
-                }
+                p.name = j["name"].get<std::string>();
+                p.uri = j["uri"].get<URI>();
+            }
+        }
+
+        void to_json(json &j, const WorkspaceFolder &p)
+        {
+            j = json{
+                {"name", p.name},
+                {"uri", p.uri}};
+        }
+
+        void from_json(const json &j, TextDocumentItem &p)
+        {
+            if (
+                j.is_object() &&
+                j.contains("uri") &&
+                j.contains("languageId") &&
+                j.contains("text") &&
+                j["uri"].is_string() &&
+                j["languageId"].is_string() &&
+                j["text"].is_string())
+            {
+                p.uri = j["uri"].get<URI>();
+                p.languageId = j["languageId"].get<std::string>();
+                p.text = j["text"].get<std::string>();
             }
         }
 
         // Inheritance is broken bro...
         namespace Params
         {
-            struct InitializeParams
+            void from_json(const json &j, DidOpenTextDocumentParams &p)
             {
-                struct ClientInfo
+                if (j.contains("textDocument") && j["textDocument"].is_object())
                 {
-                    std::string name;
-                    std::optional<std::string> version;
-                };
-
-                std::optional<ClientInfo> clientInfo;
-                std::optional<int> processId;
-
-                std::optional<std::string> locale;
-
-                std::optional<std::string> rootPath;
-                std::optional<std::string> rootUri;
-                std::string trace;
-
-                std::optional<json> initializationOptions;
-
-                json capabilities;
-
-                std::optional<std::vector<WorkspaceFolder>> workspaceFolders;
-            };
-
-            struct DidCloseTextDocumentParams
-            {
-                URI textDocument;
-            };
+                    p.textDocument = j["textDocument"].get<TextDocumentItem>();
+                }
+            }
 
             void from_json(const json &j, DidCloseTextDocumentParams &p)
             {
@@ -139,56 +124,21 @@ namespace YY
                     p.capabilities = j["capabilities"];
                 }
             }
-
-            /* void to_json(json &j, const InitializeParams &p)
-            {
-                //j = json{{"name", p.name}, {"address", p.address}, {"age", p.age}};
-            }
-
-            void from_json(const json &j, InitializeParams &p)
-            {
-                //j.at("name").get_to(p.name);
-            } */
         }
 
-        namespace Results
+        Message::operator std::string() const
         {
-            struct InitializeResult
+            json p = {
+                {"params", params},
+                {"jsonrpc", jsonrpc},
+                {"method", method}};
+
+            if (id)
             {
-                struct ServerInfo
-                {
-                    std::string name;
-                    std::optional<std::string> version;
-                };
-
-                std::optional<ServerInfo> serverInfo;
-                json capabilities;
-            };
-        }
-
-        struct Message
-        {
-            std::optional<int> id;
-            std::string jsonrpc;
-            std::string method;
-            json params;
-
-            operator std::string() const
-            {
-                json p = {
-                    {"params", params},
-                    {"jsonrpc", jsonrpc},
-                    {"method", method}};
-
-                if (id)
-                {
-                    p["id"] = *id;
-                }
-
-                return p.dump();
+                p["id"] = *id;
             }
-        };
+
+            return p.dump();
+        }
     }
 }
-
-#endif

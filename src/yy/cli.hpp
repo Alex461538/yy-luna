@@ -204,10 +204,9 @@ namespace YY
                 {
                     auto &params = std::get<BuildOptions>(parameters);
 
-                    /* 
-                    I'm thinking about this later, but
-                    it will be good to just recycle the server without the RPC complexity, just direct function execution.
-                    */
+                    YY::Scramble scramble;
+
+                    // Do any required operations
                 }
                 break;
                 case Command::Action::RPC_CONNECT:
@@ -225,7 +224,7 @@ namespace YY
                     // Consume messages until done
                     while (server.is_running())
                     {
-                        YY::RPC::Message msg = server.peek();
+                        YY::LSP::Message msg = server.peek();
                         server.process(msg);
                     }
                     // Debug for catching stuck servers
