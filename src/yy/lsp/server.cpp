@@ -17,7 +17,7 @@ namespace YY
 
         void Server::run()
         {
-            YY::Debug::log("🐥 Protect chocobos worldwide!\n");
+            YY::Debug::log("🐥 Protect chocobos worldwide!\n\n");
             running = true;
         }
 
@@ -68,15 +68,13 @@ namespace YY
                 {
                     auto params = message.params.get<YY::LSP::Params::InitializeParams>();
 
-                    if (params.workspaceFolders)
+                    if (auto &workspaceFolders = params.workspaceFolders)
                     {
-                        for (auto &folder : *params.workspaceFolders)
+                        for (auto &folder : *workspaceFolders)
                         {
                             scramble.addPackageFolder(folder);
                         }
                     }
-
-                    YY::Debug::log("%s\n\n", ((json)params.workspaceFolders).dump(4).c_str());
 
                     result = {
                         {"capabilities", {{"completionProvider", json::object()}, {"textDocumentSync", {{"openClose", true}, {"change", 1}}}}},

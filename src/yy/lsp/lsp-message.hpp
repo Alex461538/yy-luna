@@ -7,6 +7,7 @@
 //  --- Project includes ---
 #include <json.hpp>
 //  --- Local includes ---
+#include "../out.hpp"
 
 using json = nlohmann::json;
 
@@ -33,12 +34,11 @@ namespace YY
         };
 
         void from_json(const json &j, URI &p);
-        void to_json(json &j, const URI &p);
-
         void from_json(const json &j, WorkspaceFolder &p);
-        void to_json(json &j, const WorkspaceFolder &p);
-
         void from_json(const json &j, TextDocumentItem &p);
+        
+        void to_json(json &j, const URI &p);
+        void to_json(json &j, const WorkspaceFolder &p);
 
         // Inheritance is broken bro...
         namespace Params

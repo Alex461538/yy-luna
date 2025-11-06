@@ -4,6 +4,6 @@ namespace YY
 {
     void Scramble::addPackageFolder( YY::LSP::WorkspaceFolder folder )
     {
-        YY::Out::log("fuck workspaces\n");
+        YY::Debug::log("A mi me gusta la empanadaaaaaaa %s \n", folder.uri.text.c_str());
     }
 }

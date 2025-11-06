@@ -114,14 +114,21 @@ namespace YY
                     }
                     if (j.contains("workspaceFolders") && j["workspaceFolders"].is_array())
                     {
-                        p.workspaceFolders = {};
+                        p.workspaceFolders = std::vector<WorkspaceFolder>{};
+
                         for (auto &wsf : j["workspaceFolders"])
                         {
                             p.workspaceFolders->push_back(wsf.get<WorkspaceFolder>());
                         }
                     }
-                    p.initializationOptions = j["initializationOptions"];
-                    p.capabilities = j["capabilities"];
+                    if (j.contains("initializationOptions") && j["initializationOptions"].is_object())
+                    {
+                        p.initializationOptions = j["initializationOptions"];
+                    }
+                    if (j.contains("capabilities") && j["capabilities"].is_object())
+                    {
+                        p.capabilities = j["capabilities"];
+                    }
                 }
             }
         }

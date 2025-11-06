@@ -17,7 +17,7 @@ namespace YY
         extern YY::Constants::TransportKind out_place;
 
         void _clear(YY::Constants::TransportKind out);
-        void _log(const char *__restrict fmt, va_list &args, YY::Constants::TransportKind out);
+        void _log(const char * fmt, va_list &args, YY::Constants::TransportKind out);
 
         inline void log(const char *fmt, ...)
         {
