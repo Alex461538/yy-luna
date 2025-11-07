@@ -17,7 +17,29 @@ namespace YY
     {
         struct URI
         {
+            /* 
+            Htf I parse this
+            foo://example.com:8042/over/there?name=ferret#nose
+            \_/   \______________/\_________/ \_________/ \__/
+            |           |            |            |        |
+            scheme     authority       path        query   fragment
+            |   _____________________|__
+            / \ /                        \
+            urn:example:animal:ferret:nose
+            */
+            std::string scheme;
+            std::string authority;
+            std::string path;
             std::string text;
+
+            bool hasPath();
+            bool hasAuthority();
+            bool hasScheme();
+            std::string getPath();
+            std::string getAuthority();
+            std::string getScheme();
+
+            void parse(std::string uri);
         };
 
         struct WorkspaceFolder

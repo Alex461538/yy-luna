@@ -13,11 +13,15 @@ add_executable(yy-luna
     src//yy/out.cpp
     src/yy/constants.cpp
 
+    src/yy/lex/lexer.cpp
+    src/yy/lex/token.cpp
+
     src/yy/lsp/lsp-message.cpp
     src/yy/lsp/rpc.cpp
     src/yy/lsp/server.cpp
 
-    src/yy/fs/text_document.cpp
+    src/yy/scramble/textfile.cpp
+    src/yy/scramble/package.cpp
     src/yy/scramble/scramble.cpp
 )
 

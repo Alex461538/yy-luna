@@ -3,15 +3,21 @@
 
 //  --- Global includes ---
 #include <optional>
+#include <variant>
+#include <filesystem>
+#include <memory>
 //  --- Project includes ---
 //  --- Local includes ---
 #include "../out.hpp"
-#include "../lsp/lsp-message.hpp"
+
+#include "package.hpp"
 
 namespace YY
 {
     struct Scramble {
-        void addPackageFolder( YY::LSP::WorkspaceFolder folder );
+        std::map<std::string, std::shared_ptr<YY::Package>> packages;
+
+        std::shared_ptr<YY::Package> addPackageFolder( std::filesystem::path path );
     };
 }
 

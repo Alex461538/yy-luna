@@ -4,11 +4,40 @@ namespace YY
 {
     namespace LSP
     {
+        bool URI::hasPath() { return !path.empty(); }
+        bool URI::hasAuthority() { return !authority.empty(); }
+        bool URI::hasScheme() { return !scheme.empty(); }
+        std::string URI::getPath() { return path; }
+        std::string URI::getAuthority() { return authority; }
+        std::string URI::getScheme() { return scheme; }
+
+        void URI::parse(std::string uri)
+        {
+            size_t sep_scheme_authority = uri.find("://");
+            size_t sep_authority_path = sep_scheme_authority != std::string::npos ?
+                                         uri.find("/", sep_scheme_authority + 3) : std::string::npos;
+            size_t sep_path_query = sep_authority_path != std::string::npos ?
+                                         uri.find("?", sep_authority_path) : std::string::npos;
+            
+            if (
+                sep_scheme_authority == std::string::npos ||
+                sep_authority_path == std::string::npos
+            )
+            {
+                return;
+            }
+
+            text = uri;
+            scheme = uri.substr(0, sep_scheme_authority);
+            authority = uri.substr(sep_scheme_authority + 3, sep_authority_path - sep_scheme_authority - 3);
+            path = uri.substr(sep_authority_path, sep_path_query);
+        }
+
         void from_json(const json &j, URI &p)
         {
             if (j.is_string())
             {
-                p.text = j.get<std::string>();
+                p.parse( j.get<std::string>() );
             }
         }
 

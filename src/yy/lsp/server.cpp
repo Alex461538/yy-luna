@@ -72,7 +72,10 @@ namespace YY
                     {
                         for (auto &folder : *workspaceFolders)
                         {
-                            scramble.addPackageFolder(folder);
+                            if (folder.uri.hasPath())
+                            {
+                                scramble.addPackageFolder(folder.uri.getPath());
+                            }
                         }
                     }
 
