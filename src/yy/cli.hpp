@@ -163,8 +163,10 @@ namespace YY
                 argh::parser cmdl;
 
                 cmdl.add_params(
-                    {"--transport",
-                     "--isa", "--osapi", "--pkg"});
+                    {
+                    "--transport",
+                     "--isa", "--osapi", "--pkg", "--source"
+                    });
 
                 cmdl.parse(arg_count, args);
 
@@ -177,6 +179,8 @@ namespace YY
                     set_build_isa(cmdl("--isa", "").str());
                     set_build_pkg(cmdl("--pkg", "").str());
                     set_build_osapi(cmdl("--osapi", "").str());
+
+                    std::get<BuildOptions>(parameters).source = cmdl("--source", "").str();
                 }
                 break;
                 case Command::Action::RPC_CONNECT:
@@ -204,7 +208,13 @@ namespace YY
                 {
                     auto &params = std::get<BuildOptions>(parameters);
 
+                    YY::Out::set_out(YY::Constants::TransportKind::STDIO);
+
                     YY::Scramble scramble;
+
+                    std::filesystem::path candidate_path = std::filesystem::current_path() / params.source;
+
+                    auto root = scramble.addPackageFolder( candidate_path );
 
                     // Do any required operations
                 }

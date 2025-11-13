@@ -8,6 +8,7 @@
 #include <vector>
 //  --- Project includes ---
 //  --- Local includes ---
+#include "../global.hpp"
 #include "../out.hpp"
 
 #include "../lex/token.hpp"
@@ -16,6 +17,12 @@
 namespace YY
 {
     struct TextFile {
+        struct ImportEntry {
+            std::string name;
+            Global::VersionSelector versionSelector;
+            std::optional<std::shared_ptr<TextFile>> reference;
+        };
+
         std::string name;
         std::filesystem::path dir;
 

@@ -12,6 +12,7 @@ add_executable(yy-luna
 
     src//yy/out.cpp
     src/yy/constants.cpp
+    src/yy/global.cpp
 
     src/yy/lex/lexer.cpp
     src/yy/lex/token.cpp

@@ -9,6 +9,7 @@
 #include <semver.hpp>
 #include <json.hpp>
 //  --- Local includes ---
+#include "../global.hpp"
 #include "../out.hpp"
 #include "textfile.hpp"
 
@@ -16,16 +17,17 @@ using json = nlohmann::json;
 
 namespace YY
 {
-    typedef semver::version<int, int, int> Version;
-    typedef semver::range_set<int, int, int> VersionRange;
-    typedef std::variant<Version, VersionRange> VersionSelector;
+    struct Package
+    {
+        struct PackageEntry
+        {
+            std::string name;
+            Global::VersionSelector versionSelector;
+            std::optional<std::shared_ptr<Package>> reference;
+        };
 
-    struct PackageEntry {
-        std::string name;
-        VersionSelector versionSelector;
-    };
+        std::map<std::string, std::shared_ptr<YY::TextFile>> files;
 
-    struct Package {
         std::string name;
         std::string description;
         std::string author;
@@ -36,10 +38,11 @@ namespace YY
         semver::version<int> version;
 
         std::vector<std::string> keywords;
-        std::vector<PackageEntry>packages;
+        std::vector<Package::PackageEntry> packages;
 
         bool fromPath(std::filesystem::path path);
-        bool loadFiles();
+        std::optional<std::shared_ptr<YY::TextFile>> findFile(std::filesystem::path path);
+        std::optional<std::shared_ptr<YY::TextFile>> addFile(std::filesystem::path path);
     };
 }
 

@@ -8,6 +8,7 @@
 #include <memory>
 //  --- Project includes ---
 //  --- Local includes ---
+#include "../global.hpp"
 #include "../out.hpp"
 
 #include "package.hpp"
@@ -17,7 +18,8 @@ namespace YY
     struct Scramble {
         std::map<std::string, std::shared_ptr<YY::Package>> packages;
 
-        std::shared_ptr<YY::Package> addPackageFolder( std::filesystem::path path );
+        std::optional<std::shared_ptr<YY::Package>> findPackage( std::filesystem::path path );
+        std::optional<std::shared_ptr<YY::Package>> addPackageFolder( std::filesystem::path path );
     };
 }
 

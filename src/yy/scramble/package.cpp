@@ -4,22 +4,23 @@ namespace YY
 {
     bool Package::fromPath(std::filesystem::path path)
     {
+        /* A package can't be resolved from a relative path as is */
         if (!path.is_absolute())
         {
             return false;
         }
-
+        /* Store path and load it's yyconf */
         dir = path;
-
         json yyconf = {};
         std::ifstream file((std::filesystem::path(path) / "yyconf.json").c_str());
-
+        /* Was it loaded? */
         if (file.fail())
         {
             return false;
         }
         else
         {
+            /* Was it valid JSON? */
             try
             {
                 yyconf = json::parse(file);
@@ -29,11 +30,11 @@ namespace YY
                 return false;
             }
         }
-
+        /* Release the file */
         file.close();
-
         if (yyconf.is_object())
         {
+            /* Has it the required properties? */
             if (
                 yyconf.contains("name") &&
                 yyconf.contains("main") &&
@@ -43,17 +44,19 @@ namespace YY
                 yyconf["main"].is_string())
             {
                 name = yyconf["name"].get<std::string>();
-
                 main = yyconf["main"].get<std::string>();
+                /* The path for main should be a relative file */
                 if (main.is_absolute())
                 {
                     return false;
                 }
+                /* Calculate the final main path and check for existance */
                 main = path / main;
                 if (!std::filesystem::exists(main))
                 {
                     return false;
                 }
+                /* Check for a valid package version */
                 if (!semver::parse(yyconf["version"].get<std::string>(), version))
                 {
                     return false;
@@ -63,16 +66,17 @@ namespace YY
             {
                 return false;
             }
-
+            /* Author property */
             if (yyconf.contains("author") && yyconf["author"].is_string())
             {
                 author = yyconf["author"].get<std::string>();
             }
+            /* Description property */
             if (yyconf.contains("description") && yyconf["description"].is_string())
             {
                 description = yyconf["description"].get<std::string>();
             }
-
+            /* Keywords list */
             if (yyconf.contains("keywords") && yyconf["keywords"].is_array())
             {
                 for (const auto &keyword : yyconf["keywords"])
@@ -83,14 +87,14 @@ namespace YY
                     }
                 }
             }
-
+            /* Packages list */
             if (yyconf.contains("packages") && yyconf["packages"].is_array())
             {
                 for (const auto &package : yyconf["packages"])
                 {
                     if (package.is_object())
                     {
-                        YY::PackageEntry pkg;
+                        YY::Package::PackageEntry pkg;
 
                         if (package.contains("name") and package["name"].is_string())
                         {
@@ -115,7 +119,6 @@ namespace YY
                                 return false;
                             }
                         }
-
                         packages.push_back(pkg);
                     }
                 }
@@ -125,12 +128,42 @@ namespace YY
         {
             return false;
         }
-
         return true;
     }
 
-    bool Package::loadFiles()
+    std::optional<std::shared_ptr<YY::TextFile>> Package::findFile( std::filesystem::path path )
     {
-        //
+        /* Search the required package */
+        auto f = files.find( path );
+        /* Is it saved into the map? */
+        if ( f != files.end() )
+        {
+            return f->second;
+        }
+        return {};
+    }
+
+    std::optional<std::shared_ptr<YY::TextFile>> Package::addFile(std::filesystem::path path)
+    {
+        /* Files can't be resolved from relative paths */
+        if (!path.is_absolute())
+        {
+            return {};
+        }
+        /* Was this file previously loaded? */
+        auto preloaded = findFile( path );
+        if (preloaded)
+        {
+            return *preloaded;
+        }
+        /* Create a new file */
+        auto f = std::make_shared<YY::TextFile>();
+        /* Try to initialie a file from the given path */
+        if ( !f->fromPath(path) )
+        {
+            return {};
+        }
+
+        return {};
     }
 }
