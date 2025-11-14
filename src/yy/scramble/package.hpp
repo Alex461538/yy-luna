@@ -43,6 +43,8 @@ namespace YY
         bool fromPath(std::filesystem::path path);
         std::optional<std::shared_ptr<YY::TextFile>> findFile(std::filesystem::path path);
         std::optional<std::shared_ptr<YY::TextFile>> addFile(std::filesystem::path path);
+
+        std::optional<std::shared_ptr<Package>> resolvePackage(std::string name, std::optional<Global::VersionSelector> version_selector);
     };
 }
 

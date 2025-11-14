@@ -49,7 +49,11 @@ namespace YY
             {
                 YY::Debug::log("Found at: %s!\n", (*import_path).c_str());
                 /* Add import recursively */
-                addPackageFolder(*import_path);
+                auto dep = addPackageFolder(*import_path);
+                if (dep)
+                {
+                    package.reference = *dep;
+                }
             }
             else
             {

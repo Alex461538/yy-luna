@@ -1,0 +1,9 @@
+{
+    "name": "truetype",
+    "version": "0.1.0",
+    "description": "YY truetype loader",
+    "keywords": [],
+    "author": "Alex",
+    "main": "main.yy",
+    "packages": []
+}

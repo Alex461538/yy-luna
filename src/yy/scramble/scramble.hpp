@@ -16,6 +16,11 @@
 namespace YY
 {
     struct Scramble {
+        /* 
+         This can generate problems if two 
+         yyconf entries with different versions 
+         are used and the both point to the same path (overwrite)
+        */
         std::map<std::string, std::shared_ptr<YY::Package>> packages;
 
         std::optional<std::shared_ptr<YY::Package>> findPackage( std::filesystem::path path );

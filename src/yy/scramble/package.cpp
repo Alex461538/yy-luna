@@ -143,8 +143,57 @@ namespace YY
         return {};
     }
 
+    std::optional<std::shared_ptr<Package>> Package::resolvePackage(std::string name, std::optional<Global::VersionSelector> version_selector)
+    {
+        if (version_selector)
+        {
+            std::shared_ptr<Package> p;
+            for ( auto &pkg : packages )
+            {
+                if (
+                    (std::holds_alternative<Global::Version>(*version_selector) && ( 
+                        pkg.name == name && 
+                        pkg.reference && (
+                            (*(pkg.reference))->version == std::get<Global::Version>(*version_selector)) )) ||
+                    (std::holds_alternative<Global::VersionRange>(*version_selector) && ( 
+                        pkg.name == name && 
+                        pkg.reference && 
+                        std::get<Global::VersionRange>(*version_selector).contains( (*(pkg.reference))->version ) && (
+                            p == nullptr || 
+                            (*(pkg.reference))->version > p->version) ))
+                     )
+                {
+                    p = *(pkg.reference);
+                }
+            }
+            if ( p ) {
+                return p;
+            }
+        }
+        else
+        {
+            std::shared_ptr<Package> p;
+            for ( auto &pkg : packages )
+            {
+                if (
+                    pkg.name == name && 
+                    pkg.reference && (
+                    p == nullptr || (*(pkg.reference))->version > p->version) )
+                {
+                    p = *(pkg.reference);
+                }
+            }
+            if ( p ) {
+                return p;
+            }
+        }
+
+        return {};
+    }
+
     std::optional<std::shared_ptr<YY::TextFile>> Package::addFile(std::filesystem::path path)
     {
+        YY::Debug::log("Loading file at: %s\n", path.c_str());
         /* Files can't be resolved from relative paths */
         if (!path.is_absolute())
         {
@@ -154,6 +203,7 @@ namespace YY
         auto preloaded = findFile( path );
         if (preloaded)
         {
+            YY::Debug::log("This file was loaded before\n");
             return *preloaded;
         }
         /* Create a new file */
@@ -163,7 +213,40 @@ namespace YY
         {
             return {};
         }
+        /* Save in the registry */
+        files[ std::string(path) ] = f;
+        /* Lex file, you know, right? */
+        f->lex();
+        /* Generate any preprocessor information for the file */
+        f->preprocess();
+        /* Resolve imports */
+        for (auto &import : f->imports)
+        {
+            YY::Debug::log("Resolving for file the entry: %s\n", import.name.c_str());
 
-        return {};
+            std::filesystem::path candidate_file = f->dir / import.name;
+            /* itsa fil */
+            if ( std::filesystem::exists(candidate_file) )
+            {
+                /* Add a file */
+                import.reference = addFile( candidate_file );
+            }
+            else
+            /* Itsa lib */
+            {
+                /* Try to resolve an entry from the packages */
+                import.reference = resolvePackage( import.name, import.versionSelector );
+                /* Was it found? */
+                if (import.reference)
+                {
+                    YY::Debug::log("Got this: %s\n", std::get<std::shared_ptr<Package>>(*import.reference)->dir.c_str());
+                }
+                else
+                {
+                    // please panic
+                }
+            }
+        }
+        return f;
     }
 }

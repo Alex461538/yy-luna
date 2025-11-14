@@ -9,6 +9,14 @@
         {
             "name": "std",
             "version": "1.0.0"
+        },
+        {
+            "name": "truetype",
+            "version": "1.0.0"
+        },
+        {
+            "name": "truetype",
+            "version": "0.1.0"
         }
     ]
 }

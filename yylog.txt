@@ -2,3 +2,28 @@ Loading package at: /home/alex/Documents/github-repo/yy-luna/samples/test
 Resolving yyconf package entry: std
 Found at: /home/alex/Documents/github-repo/yy-luna/build/../packages/std!
 Loading package at: /home/alex/Documents/github-repo/yy-luna/build/../packages/std
+Loading file at: /home/alex/Documents/github-repo/yy-luna/build/../packages/std/main.yy
+Resolving yyconf package entry: truetype
+Found at: /home/alex/Documents/github-repo/yy-luna/build/../packages/truetype!
+Loading package at: /home/alex/Documents/github-repo/yy-luna/build/../packages/truetype
+Loading file at: /home/alex/Documents/github-repo/yy-luna/build/../packages/truetype/main.yy
+Resolving yyconf package entry: truetype
+Found at: /home/alex/Documents/github-repo/yy-luna/build/../packages/truetype@0.1.0!
+Loading package at: /home/alex/Documents/github-repo/yy-luna/build/../packages/truetype@0.1.0
+Loading file at: /home/alex/Documents/github-repo/yy-luna/build/../packages/truetype@0.1.0/main.yy
+Loading file at: /home/alex/Documents/github-repo/yy-luna/samples/test/main.yy
+Resolving for file the entry: std
+Got this: /home/alex/Documents/github-repo/yy-luna/build/../packages/std
+Resolving for file the entry: truetype
+Got this: /home/alex/Documents/github-repo/yy-luna/build/../packages/truetype
+Resolving for file the entry: truetype
+Got this: /home/alex/Documents/github-repo/yy-luna/build/../packages/truetype@0.1.0
+Resolving for file the entry: sub/sub.yy
+Loading file at: /home/alex/Documents/github-repo/yy-luna/samples/test/sub/sub.yy
+Resolving for file the entry: std
+Got this: /home/alex/Documents/github-repo/yy-luna/build/../packages/std
+Resolving for file the entry: truetype
+Got this: /home/alex/Documents/github-repo/yy-luna/build/../packages/truetype@0.1.0
+Resolving for file the entry: sub/sub.yy
+Loading file at: /home/alex/Documents/github-repo/yy-luna/samples/test/sub/sub.yy
+This file was loaded before

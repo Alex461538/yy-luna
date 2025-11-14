@@ -9,7 +9,7 @@
         {
             "name": "truetype",
             "version": "0.1.0",
-            "path": "packages/truetype"
+            "path": "packages/truetype@0.1.0"
         },
         {
             "name": "std",
